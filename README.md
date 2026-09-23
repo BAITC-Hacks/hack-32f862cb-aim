@@ -1,8 +1,20 @@
 # OptiStock
 
-Бэкенд MVP планирования закупок для кейса «Электрокомплект», HackAlem AI. Закупщик импортирует тестовые данные IEK/Systeme Electric, рассчитывает потребность, проверяет объяснение, правит и утверждает заказ по поставщику, выгружает CSV.
+MVP планирования закупок для кейса «Электрокомплект», HackAlem AI: FastAPI-бэкенд и React-интерфейс. Закупщик импортирует тестовые данные IEK/Systeme Electric, рассчитывает потребность, проверяет объяснение, правит и утверждает заказ по поставщику, выгружает CSV.
 
-Работаем с имеющимися 12 тестовыми XLSX. Новые данные не ожидаются. Недостающие условия задаются явным сценарием и сохраняются в каждом расчёте. Текущий этап — backend; React-интерфейс ещё не реализован.
+Работаем с имеющимися 12 тестовыми XLSX. Новые данные не ожидаются. Недостающие условия задаются явным сценарием и сохраняются в каждом расчёте.
+
+## React-интерфейс
+
+```powershell
+cd frontend
+npm.cmd ci
+npm.cmd run dev
+```
+
+Открыть **http://localhost:5173**. Нужен Node.js 24; в Linux/macOS используйте `npm` вместо `npm.cmd`. По умолчанию доступен интерактивный деморежим. Для работы с бэкендом: **Settings → API address `/api/v1` → API access key → Connect workspace**.
+
+Реализованы Dashboard, Inventory, Suppliers, Orders, Forecast, Analytics, Reports и Settings. Полная инструкция, особенности данных и проверки: [frontend/README.md](frontend/README.md).
 
 ## Запуск в Docker
 
@@ -14,9 +26,10 @@ docker compose up -d --build
 docker compose ps
 ```ффф
 
-`configure.py` создаёт случайные пароли, не перезаписывая существующий `.env`. Сервисы: PostgreSQL 17, миграции Alembic, FastAPI и отдельный worker. База и файлы сохраняются в volumes. API слушает только `127.0.0.1:8000`, PostgreSQL — `127.0.0.1:5435`.
+`configure.py` создаёт случайные пароли, не перезаписывая существующий `.env`. Сервисы: PostgreSQL 17, миграции Alembic, FastAPI, отдельный worker и React frontend через Nginx. База и файлы сохраняются в volumes. Frontend слушает `127.0.0.1:5173`, API — `127.0.0.1:8000`, PostgreSQL — `127.0.0.1:5435`.
 
 - Swagger: <http://localhost:8000/docs>
+- React frontend: <http://localhost:5173>
 - API health: <http://localhost:8000/health/live>
 - БД и миграции: <http://localhost:8000/health/ready>
 

@@ -25,6 +25,14 @@ x-app: &app
     options: {max-size: "10m", max-file: "3"}
 
 services:
+  frontend:
+    build: ./frontend
+    image: optistock-frontend:local
+    ports: ["127.0.0.1:5173:80"]
+    depends_on:
+      api: {condition: service_healthy}
+    restart: unless-stopped
+    mem_limit: 128m
   db:
     build:
       context: .

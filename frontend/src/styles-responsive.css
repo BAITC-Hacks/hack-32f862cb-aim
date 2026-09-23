@@ -1,0 +1,1463 @@
+@media (min-width: 1700px) {
+  .dashboard-layout {
+    grid-template-columns: minmax(0, 1fr) 365px;
+    gap: 22px;
+  }
+  .dashboard-primary .page-heading h1 {
+    font-size: 30px;
+  }
+  .metric-card {
+    padding: 19px 17px;
+    min-height: 111px;
+  }
+  .metric-label {
+    font-size: 12px;
+  }
+  .metric-content > strong {
+    font-size: 28px;
+  }
+  .metric-description {
+    font-size: 10px;
+  }
+  .dashboard-chart-row > .panel {
+    height: 275px;
+  }
+  .inventory-overview {
+    gap: 30px;
+    padding-left: 25px;
+    padding-right: 30px;
+  }
+  .donut {
+    width: 210px;
+  }
+  .donut-legend > div {
+    font-size: 12px;
+  }
+  .dashboard-chart-row .chart-canvas {
+    height: 177px;
+  }
+  .dashboard-chart-row .demand-chart {
+    height: 208px;
+  }
+  .dashboard-middle-row > .panel {
+    height: 212px;
+  }
+  .dashboard-middle-row .stock-bars {
+    height: 157px;
+  }
+  .activity-list {
+    padding-top: 12px;
+  }
+  .activity-list > button {
+    padding: 8px 0;
+  }
+  .activity-title {
+    font-size: 11px;
+  }
+  .inventory-compact td {
+    height: 38px;
+    font-size: 10px;
+  }
+  .inventory-compact th {
+    height: 32px;
+    font-size: 9px;
+  }
+  .dashboard-rail {
+    gap: 20px;
+  }
+  .intelligence-banner {
+    height: 166px;
+  }
+  .intelligence-banner h2 {
+    font-size: 18px;
+  }
+  .insights-list > button {
+    padding: 14px 3px;
+  }
+  .insights-list strong,
+  .insights-list small {
+    font-size: 11px;
+  }
+  .risk-products > button {
+    padding: 11px 0;
+  }
+  .risk-product-name {
+    font-size: 11px;
+  }
+  .health-card {
+    height: 150px;
+  }
+}
+@media (max-width: 1450px) {
+  .sidebar {
+    width: 200px;
+    padding-left: 11px;
+    padding-right: 11px;
+  }
+  .brand {
+    font-size: 22px;
+    padding: 0 11px;
+  }
+  .workspace-main {
+    margin-left: 200px;
+  }
+  .topbar {
+    padding: 0 20px;
+    gap: 15px;
+  }
+  .topbar-actions {
+    gap: 13px;
+  }
+  .topbar-actions > .mode-chip {
+    display: none;
+  }
+  main {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+  .dashboard-layout {
+    grid-template-columns: minmax(0, 1fr) 300px;
+    gap: 17px;
+  }
+  .metric-card {
+    gap: 8px;
+    padding: 14px 10px;
+  }
+  .metric-card > .icon-tile {
+    width: 30px;
+    height: 32px;
+  }
+  .metric-card > .icon-tile > svg {
+    width: 19px;
+  }
+  .metric-label {
+    font-size: 9px;
+  }
+  .metric-content > strong {
+    font-size: 23px;
+  }
+  .metric-description {
+    font-size: 8px;
+  }
+  .mini-bars {
+    right: 9px;
+    opacity: 0.23;
+  }
+  .metrics-grid {
+    gap: 10px;
+  }
+  .dashboard-primary .page-heading h1 {
+    font-size: 25px;
+  }
+  .inventory-overview {
+    gap: 12px;
+    padding-left: 12px;
+    padding-right: 17px;
+  }
+  .donut {
+    width: 160px;
+  }
+  .donut-label strong {
+    font-size: 26px;
+  }
+  .donut-legend > div {
+    font-size: 10px;
+    gap: 8px;
+  }
+  .donut-legend strong {
+    font-size: 10px;
+  }
+  .panel-heading {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+  .dashboard-rail .panel-heading h2 {
+    font-size: 12px;
+  }
+  .dashboard-rail .panel-heading .text-link {
+    font-size: 9px;
+    gap: 3px;
+  }
+  .stock-bars {
+    gap: 12px;
+    padding-left: 18px;
+    padding-right: 18px;
+  }
+  .activity-title {
+    font-size: 9px;
+  }
+  .activity-list {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+  .activity-list > button {
+    gap: 7px;
+  }
+  .activity-list time {
+    font-size: 8px;
+  }
+  .activity-list .badge {
+    font-size: 8px;
+    margin-left: 0;
+  }
+  .inventory-compact .inventory-toolbar {
+    gap: 8px;
+  }
+  .inventory-compact .table-actions {
+    margin-left: 0;
+    flex: 1;
+    justify-content: flex-end;
+  }
+  .inventory-compact .table-actions .search-input {
+    flex: 1;
+    max-width: 220px;
+  }
+  .inventory-compact .table-actions .search-input input {
+    font-size: 10px;
+  }
+  .inventory-compact .table-actions .button {
+    font-size: 10px;
+  }
+  .inventory-compact .status-tabs > button {
+    font-size: 9px;
+    padding: 0 7px;
+  }
+  .risk-products {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+  .risk-products > button {
+    gap: 8px;
+  }
+  .risk-product-name {
+    font-size: 9px;
+  }
+  .risk-products .badge {
+    font-size: 8px;
+    padding: 4px 6px;
+  }
+  .stock-left {
+    font-size: 8px;
+    min-width: 32px;
+  }
+  .product-thumbnail {
+    width: 34px;
+    height: 36px;
+  }
+  .health-number {
+    min-width: 94px;
+    padding: 14px 12px;
+  }
+  .dashboard-bottom-note {
+    font-size: 8px;
+  }
+  .dashboard-bottom-note button {
+    font-size: 8px;
+  }
+  .supplier-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .page-heading h1 {
+    font-size: 26px;
+  }
+  .forecast-layout {
+    grid-template-columns: minmax(0, 1fr) 305px;
+  }
+  .next-step {
+    gap: 10px;
+  }
+  .next-step p {
+    max-width: 270px;
+  }
+  .next-step strong {
+    font-size: 11px;
+  }
+  .next-step .button {
+    padding: 0 8px;
+    font-size: 9px;
+  }
+  .settings-layout {
+    grid-template-columns: minmax(0, 1fr) 300px;
+  }
+}
+@media (max-width: 1200px) {
+  .sidebar {
+    width: 76px;
+    padding: 25px 11px;
+  }
+  .brand {
+    justify-content: center;
+    padding: 0;
+  }
+  .brand svg {
+    width: 31px;
+  }
+  .brand > span,
+  .sidebar-search,
+  .nav-item > span,
+  .nav-item > small,
+  .workspace-card,
+  .profile > div:nth-child(2),
+  .profile > svg {
+    display: none;
+  }
+  .sidebar nav {
+    margin-top: 35px;
+    gap: 9px;
+  }
+  .nav-item {
+    justify-content: center;
+    padding: 12px;
+    min-height: 45px;
+  }
+  .nav-item svg {
+    width: 21px;
+    height: 21px;
+  }
+  .sidebar-bottom {
+    padding-top: 30px;
+  }
+  .profile {
+    justify-content: center;
+    padding: 0;
+  }
+  .profile .avatar {
+    width: 35px;
+    height: 35px;
+    font-size: 12px;
+  }
+  .workspace-main {
+    margin-left: 76px;
+  }
+  .sidebar-bottom > .nav-item {
+    margin-bottom: 25px;
+  }
+  .dashboard-layout {
+    grid-template-columns: minmax(0, 1fr) 290px;
+    gap: 16px;
+  }
+  .dashboard-chart-row {
+    grid-template-columns: 1fr 1.1fr;
+    gap: 12px;
+  }
+  .dashboard-middle-row {
+    gap: 12px;
+  }
+  .inventory-overview {
+    gap: 7px;
+    padding-left: 5px;
+    padding-right: 10px;
+  }
+  .donut {
+    width: 150px;
+    max-width: 54%;
+  }
+  .donut-legend > div {
+    gap: 6px;
+    font-size: 9px;
+  }
+  .donut-legend strong {
+    font-size: 9px;
+  }
+  .donut-legend {
+    gap: 18px;
+  }
+  .metric-card {
+    padding: 12px 9px;
+    gap: 8px;
+  }
+  .metric-card > .icon-tile {
+    width: 27px;
+    height: 29px;
+  }
+  .metric-label {
+    font-size: 8px;
+  }
+  .metric-description {
+    font-size: 7px;
+  }
+  .metric-content > strong {
+    font-size: 22px;
+  }
+  .mini-bars {
+    display: none;
+  }
+  .global-search {
+    max-width: 450px;
+  }
+  .dashboard-primary .page-heading h1 {
+    font-size: 24px;
+  }
+  .activity-list time {
+    display: none;
+  }
+  .activity-list .badge {
+    margin-left: auto;
+  }
+  .stock-bars {
+    gap: 10px;
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+  .stock-bar-label {
+    font-size: 8px;
+  }
+  .forecast-layout {
+    gap: 17px;
+  }
+  .product-select {
+    max-width: 240px;
+  }
+  .report-card {
+    padding: 20px;
+  }
+  .report-card h2 {
+    font-size: 14px;
+  }
+  .report-card p {
+    font-size: 10px;
+  }
+  .report-card > div {
+    flex-wrap: wrap;
+  }
+  .page-heading {
+    flex-wrap: wrap;
+  }
+  .page-actions {
+    flex-shrink: 1;
+  }
+  .analytics-grid .inventory-overview {
+    padding: 20px;
+    gap: 20px;
+  }
+  .analytics-grid .donut {
+    max-width: 50%;
+  }
+  .settings-layout {
+    gap: 18px;
+  }
+  .dataset-setting {
+    flex-wrap: wrap;
+  }
+  .dataset-setting > label {
+    flex-basis: 100%;
+  }
+  .skip-link {
+    left: 85px;
+  }
+}
+@media (max-width: 1020px) {
+  .dashboard-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .dashboard-rail {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+    padding-top: 0;
+  }
+  .intelligence-banner {
+    height: 180px;
+    min-height: 100%;
+  }
+  .intelligence-banner h2 {
+    font-size: 20px;
+    margin-top: 17px;
+  }
+  .banner-label {
+    font-size: 9px;
+  }
+  .intelligence-banner > button {
+    font-size: 12px;
+    margin-top: 18px;
+  }
+  .dashboard-rail > .panel:nth-child(2) {
+    grid-column: 2;
+    grid-row: 1/3;
+  }
+  .dashboard-rail > .panel:nth-child(3) {
+    grid-column: 1/3;
+  }
+  .risk-products {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0 20px;
+  }
+  .risk-product-name {
+    font-size: 12px;
+  }
+  .risk-products .badge {
+    font-size: 10px;
+  }
+  .stock-left {
+    font-size: 10px;
+  }
+  .product-thumbnail {
+    width: 40px;
+    height: 42px;
+  }
+  .dashboard-rail > .panel:nth-child(4) {
+    grid-column: 1;
+    grid-row: 2;
+  }
+  .rail-note {
+    grid-column: 1/3;
+  }
+  .dashboard-chart-row > .panel {
+    height: 260px;
+  }
+  .donut {
+    width: 193px;
+  }
+  .inventory-overview {
+    gap: 22px;
+    padding: 15px 25px;
+  }
+  .donut-legend > div {
+    font-size: 11px;
+    gap: 8px;
+  }
+  .donut-legend strong {
+    font-size: 11px;
+  }
+  .dashboard-chart-row .chart-canvas {
+    height: 161px;
+  }
+  .dashboard-chart-row .demand-chart {
+    height: 195px;
+  }
+  .metric-label {
+    font-size: 10px;
+  }
+  .metric-content > strong {
+    font-size: 26px;
+  }
+  .metric-description {
+    font-size: 9px;
+  }
+  .metric-card {
+    padding: 17px 13px;
+    gap: 11px;
+  }
+  .metric-card > .icon-tile {
+    width: 34px;
+    height: 35px;
+  }
+  .mini-bars {
+    display: flex;
+  }
+  .dashboard-primary .page-heading h1 {
+    font-size: 27px;
+  }
+  .dashboard-middle-row > .panel {
+    height: 200px;
+  }
+  .dashboard-middle-row .stock-bars {
+    height: 148px;
+  }
+  .activity-list > button {
+    padding: 9px 0;
+  }
+  .activity-title {
+    font-size: 11px;
+  }
+  .stock-bar-label {
+    font-size: 10px;
+  }
+  .inventory-compact .inventory-toolbar {
+    min-height: 82px;
+  }
+  .inventory-compact td {
+    height: 37px;
+    font-size: 10px;
+  }
+  .inventory-compact th {
+    font-size: 9px;
+  }
+  .dashboard-bottom-note {
+    font-size: 9px;
+  }
+  .dashboard-bottom-note button {
+    font-size: 9px;
+  }
+  .insights-list > button {
+    padding: 24px 0;
+  }
+  .insights-list strong,
+  .insights-list small {
+    font-size: 12px;
+  }
+  .topbar-date {
+    display: none;
+  }
+  .topbar-actions > .mode-chip {
+    display: flex;
+  }
+  .page-heading {
+    padding-bottom: 24px;
+    gap: 15px;
+  }
+  .page-heading h1 {
+    font-size: 25px;
+  }
+  .page-heading p {
+    font-size: 11px;
+  }
+  .forecast-layout {
+    grid-template-columns: minmax(0, 1fr) 290px;
+  }
+  .forecast-main .panel-heading {
+    flex-wrap: wrap;
+    gap: 13px;
+  }
+  .forecast-main .product-select {
+    max-width: 100%;
+  }
+  .next-step {
+    flex-wrap: wrap;
+    align-items: flex-start;
+  }
+  .next-step > div {
+    flex: 1;
+  }
+  .next-step .button {
+    margin-left: 38px;
+  }
+  .forecast-metrics {
+    gap: 10px;
+  }
+  .forecast-metrics > .panel {
+    padding: 15px;
+  }
+  .forecast-metrics span {
+    font-size: 9px;
+  }
+  .forecast-metrics strong {
+    font-size: 22px;
+  }
+  .report-grid {
+    gap: 13px;
+  }
+  .report-card {
+    padding: 17px;
+  }
+  .report-card h2 {
+    font-size: 13px;
+  }
+  .report-card p {
+    min-height: 77px;
+  }
+  .settings-layout {
+    grid-template-columns: minmax(0, 1fr) 270px;
+  }
+  .reset-demo {
+    flex-wrap: wrap;
+  }
+  .reset-demo .button {
+    margin-left: 0;
+  }
+  .settings-main .panel-heading {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .summary-card {
+    padding: 18px;
+  }
+  .summary-card > div > span {
+    font-size: 10px;
+  }
+  .summary-card strong {
+    font-size: 25px;
+  }
+}
+@media (max-width: 760px) {
+  .topbar {
+    height: 66px;
+    padding: 0 17px;
+    gap: 12px;
+  }
+  .topbar-actions {
+    gap: 7px;
+  }
+  .topbar .button-primary {
+    font-size: 10px;
+    padding: 0 10px;
+    gap: 5px;
+    height: 35px;
+  }
+  .topbar-actions > .mode-chip {
+    display: none;
+  }
+  .global-search {
+    height: 35px;
+    min-width: 80px;
+  }
+  .global-search > input {
+    font-size: 10px;
+    height: 31px;
+    min-width: 0;
+  }
+  .global-search > kbd {
+    display: none;
+  }
+  main {
+    padding: 4px 17px 14px;
+  }
+  .metrics-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  .metric-label {
+    font-size: 11px;
+  }
+  .metric-description {
+    font-size: 9px;
+  }
+  .metric-card {
+    padding: 17px;
+    min-height: 103px;
+  }
+  .metric-card > .icon-tile {
+    width: 35px;
+    height: 35px;
+  }
+  .dashboard-primary .page-heading h1 {
+    font-size: 25px;
+  }
+  .dashboard-primary .page-heading p {
+    font-size: 11px;
+  }
+  .dashboard-chart-row {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+  .dashboard-chart-row > .panel {
+    height: 260px;
+  }
+  .inventory-overview {
+    padding: 15px 30px;
+    gap: 40px;
+    justify-content: center;
+  }
+  .donut {
+    width: 190px;
+  }
+  .donut-legend {
+    max-width: 210px;
+    gap: 24px;
+  }
+  .donut-legend > div,
+  .donut-legend strong {
+    font-size: 12px;
+  }
+  .dashboard-middle-row {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+  .dashboard-middle-row > .panel {
+    height: 205px;
+  }
+  .activity-list time {
+    display: block;
+    font-size: 10px;
+  }
+  .activity-title {
+    font-size: 11px;
+  }
+  .activity-list .badge {
+    margin-left: 8px;
+    font-size: 9px;
+  }
+  .stock-bar-label {
+    font-size: 11px;
+  }
+  .dashboard-chart-row .chart-canvas {
+    height: 166px;
+  }
+  .dashboard-chart-row .demand-chart {
+    height: 200px;
+  }
+  .dashboard-bottom-note {
+    align-items: flex-start;
+    line-height: 1.7;
+  }
+  .dashboard-bottom-note button {
+    display: none;
+  }
+  .dashboard-bottom-note .connection-dot {
+    margin-top: 5px;
+  }
+  .dashboard-rail {
+    display: flex;
+  }
+  .intelligence-banner {
+    height: 170px;
+  }
+  .dashboard-rail > .panel {
+    grid-column: auto;
+  }
+  .insights-list > button {
+    padding: 15px 0;
+  }
+  .risk-products {
+    display: block;
+  }
+  .risk-products > button {
+    padding: 11px 0;
+  }
+  .health-card {
+    height: 160px;
+  }
+  .health-number {
+    min-width: 130px;
+    justify-content: center;
+  }
+  .rail-note {
+    padding-top: 0;
+  }
+  .inventory-toolbar {
+    padding: 14px;
+    gap: 16px;
+  }
+  .inventory-title-group {
+    gap: 15px;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+  }
+  .status-tabs {
+    max-width: 100%;
+  }
+  .table-actions {
+    width: 100%;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .table-actions .search-input {
+    flex: 1;
+    min-width: 120px;
+  }
+  .inventory-compact .inventory-title-group {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+  .inventory-compact .table-actions {
+    flex-basis: 100%;
+  }
+  .inventory-compact .table-actions .search-input {
+    max-width: none;
+  }
+  .filter-row {
+    flex-wrap: wrap;
+  }
+  .filter-row label {
+    flex: 1;
+    min-width: 130px;
+  }
+  .supplier-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  .supplier-heading h2 {
+    font-size: 18px;
+  }
+  .supplier-card {
+    padding: 22px 23px 0;
+  }
+  .summary-strip {
+    gap: 10px;
+  }
+  .summary-card {
+    padding: 16px;
+    gap: 10px;
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .summary-card .icon-tile {
+    width: 30px;
+    height: 30px;
+  }
+  .summary-card > div > span {
+    font-size: 9px;
+  }
+  .summary-card strong {
+    font-size: 24px;
+  }
+  .forecast-layout {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  .scenario-panel {
+    grid-row: 1;
+  }
+  .scenario-panel form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  .scenario-numbers,
+  .scenario-toggles,
+  .scenario-note {
+    grid-column: 1/-1;
+  }
+  .scenario-toggles {
+    margin-top: 0;
+  }
+  .scenario-panel form > label {
+    margin-top: 0;
+  }
+  .scenario-panel .button-ghost {
+    margin: 0;
+  }
+  .scenario-note {
+    margin: 0;
+  }
+  .scenario-numbers label {
+    font-size: 11px;
+  }
+  .scenario-toggles {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0 20px;
+  }
+  .toggle-row small {
+    font-size: 9px;
+  }
+  .forecast-main .panel-heading {
+    flex-wrap: nowrap;
+  }
+  .next-step {
+    flex-wrap: nowrap;
+    align-items: center;
+  }
+  .next-step .button {
+    margin-left: auto;
+  }
+  .next-step p {
+    font-size: 9px;
+  }
+  .chart-large {
+    padding: 0 15px;
+  }
+  .analytics-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  .analytics-grid .inventory-overview {
+    gap: 40px;
+  }
+  .report-grid {
+    grid-template-columns: 1fr;
+  }
+  .report-card {
+    padding: 22px;
+  }
+  .report-card h2 {
+    font-size: 17px;
+    margin-top: 18px;
+  }
+  .report-card p {
+    font-size: 12px;
+    min-height: 0;
+    max-width: 370px;
+  }
+  .report-card > div {
+    flex-wrap: nowrap;
+  }
+  .report-card > div > span {
+    font-size: 11px;
+  }
+  .settings-layout {
+    grid-template-columns: 1fr;
+  }
+  .settings-rail {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  .settings-help {
+    grid-column: 1/-1;
+  }
+  .settings-main .panel-heading {
+    flex-wrap: nowrap;
+  }
+  .connection-form > label {
+    font-size: 12px;
+  }
+  .settings-main .panel-description {
+    font-size: 11px;
+  }
+  .profile .avatar {
+    width: 33px;
+    height: 33px;
+  }
+  .app-footer {
+    padding: 16px 17px;
+    font-size: 8px;
+  }
+  .app-footer > a {
+    display: none;
+  }
+  .page-heading h1 {
+    font-size: 24px;
+  }
+  .page-heading p {
+    font-size: 11px;
+  }
+  .page-heading .eyebrow {
+    font-size: 8px;
+  }
+  .page-actions {
+    flex-wrap: wrap;
+  }
+  .order-details-summary {
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+  .order-details-summary strong {
+    font-size: 12px;
+  }
+  .order-details-summary > .badge {
+    margin-left: 0;
+  }
+  .order-dialog-actions {
+    flex-wrap: wrap;
+  }
+  .order-dialog-actions > span {
+    flex-basis: 100%;
+  }
+  .dialog-content {
+    padding: 20px;
+  }
+  .dialog-header {
+    padding: 20px;
+  }
+  .table-footer {
+    font-size: 9px;
+    padding: 14px;
+  }
+  .toast-stack {
+    bottom: 16px;
+    right: 16px;
+    max-width: calc(100vw - 32px);
+  }
+  .toast {
+    font-size: 11px;
+  }
+  .table-footer > .pagination {
+    gap: 8px;
+  }
+  .table-footer .button {
+    font-size: 9px;
+    padding: 0 8px;
+  }
+  .notification-popover {
+    right: -93px;
+    width: 310px;
+  }
+}
+@media (max-width: 520px) {
+  .sidebar {
+    transform: translateX(-100%);
+    width: 220px;
+    transition: transform 0.2s;
+    padding: 23px 14px;
+  }
+  .sidebar-open {
+    transform: translateX(0);
+  }
+  .sidebar-open .brand > span,
+  .sidebar-open .nav-item > span,
+  .sidebar-open .profile > div:nth-child(2) {
+    display: block;
+  }
+  .sidebar-open .brand {
+    justify-content: flex-start;
+    padding-left: 12px;
+  }
+  .sidebar-open nav {
+    margin-top: 32px;
+    gap: 4px;
+  }
+  .sidebar-open .nav-item {
+    justify-content: flex-start;
+    gap: 15px;
+  }
+  .sidebar-open .profile {
+    justify-content: flex-start;
+    gap: 12px;
+    padding-left: 7px;
+  }
+  .sidebar-open .profile > div:nth-child(2) {
+    display: flex;
+  }
+  .sidebar-open .workspace-card {
+    display: block;
+    margin-bottom: 23px;
+  }
+  .sidebar-scrim {
+    display: block;
+    position: fixed;
+    inset: 0;
+    border: 0;
+    background: #0009;
+    z-index: 39;
+  }
+  .workspace-main {
+    margin-left: 0;
+  }
+  .mobile-menu {
+    display: grid;
+    width: 26px;
+    flex-shrink: 0;
+  }
+  .topbar {
+    padding: 0 14px;
+    gap: 9px;
+  }
+  .topbar .button-primary {
+    padding: 0 9px;
+    font-size: 10px;
+  }
+  .topbar .button-primary > svg:last-child {
+    display: none;
+  }
+  .global-search > svg {
+    width: 14px;
+  }
+  .global-search {
+    padding: 0 8px;
+    gap: 7px;
+  }
+  .global-search > input {
+    font-size: 9px;
+  }
+  .notification-button {
+    width: 27px;
+  }
+  .topbar-actions {
+    gap: 4px;
+  }
+  main {
+    padding: 4px 14px 10px;
+  }
+  .dashboard-primary > .page-heading {
+    min-height: 93px;
+    padding-top: 8px;
+  }
+  .dashboard-primary .page-heading h1 {
+    font-size: 23px;
+    letter-spacing: -0.65px;
+  }
+  .dashboard-primary .page-heading p {
+    font-size: 10px;
+  }
+  .wave {
+    font-size: 22px;
+    margin-left: 2px;
+  }
+  .metric-card {
+    padding: 15px 11px;
+    gap: 10px;
+  }
+  .metric-label {
+    font-size: 9px;
+  }
+  .metric-description {
+    font-size: 8px;
+  }
+  .metric-content > strong {
+    font-size: 24px;
+  }
+  .metric-card > .icon-tile {
+    width: 31px;
+    height: 32px;
+  }
+  .mini-bars {
+    display: none;
+  }
+  .inventory-overview {
+    gap: 24px;
+    padding: 17px;
+  }
+  .donut {
+    width: 172px;
+  }
+  .donut-legend > div,
+  .donut-legend strong {
+    font-size: 11px;
+  }
+  .inventory-compact .inventory-title-group {
+    gap: 10px;
+  }
+  .inventory-compact .status-tabs {
+    gap: 0;
+    width: 100%;
+    justify-content: space-between;
+  }
+  .inventory-compact .status-tabs > button {
+    font-size: 9px;
+    padding: 0 7px;
+  }
+  .inventory-compact .table-actions .button {
+    font-size: 9px;
+    padding: 0 8px;
+  }
+  .inventory-compact .table-actions {
+    gap: 6px;
+  }
+  .inventory-compact .table-actions .search-input {
+    min-width: 100px;
+    width: 100px;
+    padding: 0 7px;
+  }
+  .search-results {
+    position: fixed;
+    top: 60px;
+    left: 14px;
+    right: 14px;
+    min-width: 0;
+  }
+  .notification-popover {
+    position: fixed;
+    top: 60px;
+    left: 14px;
+    right: 14px;
+    width: auto;
+  }
+  .risk-products > button {
+    gap: 11px;
+  }
+  .risk-product-name {
+    font-size: 11px;
+  }
+  .risk-products .badge {
+    font-size: 9px;
+  }
+  .stock-left {
+    font-size: 9px;
+  }
+  .summary-strip {
+    gap: 8px;
+  }
+  .summary-card {
+    padding: 13px;
+    gap: 9px;
+  }
+  .summary-card > div > span {
+    font-size: 8px;
+  }
+  .summary-card strong {
+    font-size: 23px;
+  }
+  .page-heading h1 {
+    font-size: 23px;
+    line-height: 1.4;
+  }
+  .page-heading p {
+    font-size: 10px;
+  }
+  .page-heading {
+    padding-top: 10px;
+  }
+  .page-actions {
+    width: 100%;
+    gap: 8px;
+  }
+  .page-actions > .search-input {
+    width: 100%;
+  }
+  .page-actions .button {
+    font-size: 10px;
+  }
+  .forecast-method {
+    font-size: 10px;
+  }
+  .scenario-panel form {
+    gap: 13px;
+    padding: 17px;
+  }
+  .scenario-toggles {
+    display: flex;
+    flex-direction: column;
+  }
+  .toggle-row small {
+    font-size: 10px;
+  }
+  .forecast-main .panel-heading {
+    flex-wrap: wrap;
+  }
+  .forecast-main .product-select {
+    width: 100%;
+  }
+  .forecast-metrics {
+    gap: 8px;
+  }
+  .forecast-metrics > .panel {
+    padding: 13px;
+  }
+  .forecast-metrics strong {
+    font-size: 23px;
+  }
+  .forecast-metrics small {
+    font-size: 9px;
+  }
+  .forecast-metrics span {
+    font-size: 8px;
+  }
+  .next-step {
+    flex-wrap: wrap;
+    margin: 0 15px;
+    gap: 12px;
+  }
+  .next-step .button {
+    margin-left: 40px;
+  }
+  .next-step p {
+    font-size: 10px;
+  }
+  .chart-large {
+    height: 280px;
+    padding: 0 9px;
+  }
+  .chart-large .chart-canvas {
+    height: 242px;
+  }
+  .chart-large .chart-legend {
+    font-size: 10px;
+  }
+  .settings-rail {
+    display: flex;
+  }
+  .settings-main .panel-heading {
+    flex-wrap: wrap;
+  }
+  .connection-form {
+    padding: 20px;
+  }
+  .dataset-setting {
+    padding: 20px;
+  }
+  .connection-actions {
+    flex-direction: column;
+  }
+  .reset-demo {
+    margin: 0 20px;
+  }
+  .report-filters {
+    flex-wrap: wrap;
+  }
+  .report-filters > .search-input {
+    flex: 1;
+    min-width: 160px;
+  }
+  .audit-list > div {
+    gap: 10px;
+    margin: 0 14px;
+  }
+  .audit-list small {
+    max-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .audit-list time {
+    font-size: 8px;
+  }
+  .audit-list strong {
+    font-size: 10px;
+  }
+  .dialog {
+    max-width: calc(100vw - 20px);
+    max-height: calc(100dvh - 30px);
+  }
+  .drawer {
+    max-width: 100vw;
+    width: 100%;
+    max-height: 100dvh;
+  }
+  .drawer .dialog-content {
+    padding: 20px;
+  }
+  .dialog-header {
+    padding: 20px;
+  }
+  .dialog-header p {
+    font-size: 10px;
+  }
+  .dialog-content {
+    padding: 18px;
+  }
+  .dialog-header h2 {
+    font-size: 16px;
+  }
+  .form-grid {
+    gap: 12px;
+  }
+  .sample-import {
+    flex-wrap: wrap;
+  }
+  .sample-import .button {
+    margin: 0;
+  }
+  .dropzone {
+    padding: 25px 12px;
+  }
+  .dropzone > span {
+    font-size: 9px;
+  }
+  .dropzone strong {
+    font-size: 11px;
+  }
+  .order-details-summary {
+    gap: 18px;
+  }
+  .order-details-summary > div > strong {
+    font-size: 11px;
+  }
+  .order-details-summary > div > span {
+    font-size: 9px;
+  }
+  .quantity-input {
+    width: 88px;
+  }
+  .skip-link {
+    left: 10px;
+  }
+  .analytics-grid .inventory-overview {
+    padding: 16px;
+    gap: 22px;
+  }
+  .health-card {
+    height: 145px;
+  }
+  .app-footer {
+    padding: 17px 14px;
+  }
+  .chart-legend > .muted {
+    font-size: 7px;
+  }
+}
+@media (max-width: 760px) {
+  .intelligence-banner {
+    min-height: 0;
+  }
+  .dashboard-rail > .panel {
+    flex-shrink: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *:before,
+  *:after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@media (max-width: 1020px) {
+  .dashboard-middle-row > .panel:has(.activity-list) {
+    height: auto;
+    min-height: 207px;
+  }
+}
