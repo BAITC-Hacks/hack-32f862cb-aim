@@ -85,7 +85,9 @@ export function demoExplanation(product: Product): Explanation {
       incoming: 0,
       balance_without_new_order: (product.available ?? 0) - ((i + 1) * (product.forecast ?? 0)) / 60,
     })),
-    outlier_exclusions: product.warnings.length ? [{ month: '2026-04', quantity: 350 }] : [],
+    outlier_exclusions: product.warnings.length
+      ? [{ date: '2026-04-12', document: 'DEMO-001', original: 550, removed: 350, method: 'illustrative' }]
+      : [],
     sources: { dataset: 'Illustrative demo data' },
   }
 }

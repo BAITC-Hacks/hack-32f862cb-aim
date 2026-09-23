@@ -3,6 +3,7 @@
 import argparse
 import json
 import time
+import uuid
 from pathlib import Path
 
 import httpx
@@ -12,6 +13,9 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--base", default="http://127.0.0.1:8000/api/v1")
     parser.add_argument("--key-file", default="var/local/api-key")
+    parser.add_argument(
+        "--fresh", action="store_true", help="Create a new agent run using current supplier commitments"
+    )
     args = parser.parse_args()
     key = Path(args.key_file).read_text().strip()
     with httpx.Client(base_url=args.base, headers={"Authorization": f"Bearer {key}"}, timeout=60) as client:
@@ -41,7 +45,11 @@ def main():
         started = time.monotonic()
         dataset = post("/datasets/sample", {"as_of": "2026-09-22"}, "jury-source-files-v1")
         wait(dataset["job_id"])
-        agent = post("/agent/runs", {"dataset_id": dataset["dataset_id"], "scenario": {}}, "jury-agent-v1")
+        agent = post(
+            "/agent/runs",
+            {"dataset_id": dataset["dataset_id"], "scenario": {}},
+            str(uuid.uuid4()) if args.fresh else "jury-agent-v1",
+        )
         wait(agent["job_id"])
         run = client.get(f"/agent/runs/{agent['run_id']}").json()
         output = Path("var/jury-agent-report.json")

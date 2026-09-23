@@ -84,3 +84,37 @@ def test_revoked_planner_cannot_publish_agent_orders(client):
     with session() as db:
         assert db.scalar(select(func.count()).select_from(Recommendation)) == 0
         assert db.scalar(select(func.count()).select_from(PurchaseOrder)) == 0
+
+
+def test_agent_counts_multi_product_documents_once_within_supplier(client):
+    from copy import deepcopy
+
+    dataset_id = seed()
+    with session() as db, db.begin():
+        items = db.scalars(select(Item)).all()
+        for item in items:
+            data = deepcopy(item.data)
+            data["sales"]["2026-08-01"] = 5200
+            data["events"] = [
+                {"date": f"2026-08-{d:02d}", "q": 10, "document": str(d)} for d in range(1, 21)
+            ] + [{"date": "2026-08-21", "q": 5000, "document": "shared-project"}]
+            item.data = data
+        item = items[0]
+        db.add(
+            Item(
+                dataset_id=item.dataset_id,
+                supplier=item.supplier,
+                code="second-product",
+                name="Second line in same document",
+                unit=item.unit,
+                available=0,
+                minimum=1,
+                multiple=1,
+                data=deepcopy(item.data),
+            )
+        )
+    result = post(client, "/api/v1/agent/runs", {"dataset_id": dataset_id}).json()
+    execute_job(*claim())
+    summary = client.get(f"/api/v1/agent/runs/{result['run_id']}").json()["report"]["summary"]
+    assert summary["outlier_corrections"] == 3
+    assert summary["excluded_documents"] == 2  # The same document number in two supplier scopes.

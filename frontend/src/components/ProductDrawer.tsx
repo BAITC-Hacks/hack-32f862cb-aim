@@ -6,6 +6,7 @@ import { errorMessage, formatNumber, supplierName } from '../lib/format'
 import type { Explanation, Product } from '../types'
 import { Badge, Button, Dialog, InlineError, Loading } from './ui'
 import { DemandChart } from './charts'
+import { DemandHistory } from './DemandHistory'
 
 export function ProductDrawer({ product, onClose }: { product: Product; onClose: () => void }) {
   const ws = useWorkspace()
@@ -94,6 +95,10 @@ export function ProductDrawer({ product, onClose }: { product: Product; onClose:
                 ['Forecast demand', formatNumber(explanation.forecast_quantity)],
                 ['Safety stock', formatNumber(explanation.safety_stock)],
                 ['Available inventory', formatNumber(explanation.inventory)],
+                [
+                  'Incoming during forecast',
+                  formatNumber(explanation.daily_projection.reduce((total, day) => total + day.incoming, 0)),
+                ],
                 ['Annual trend', `${((explanation.annual_trend_ratio - 1) * 100).toFixed(1)}%`],
                 ['Unrounded requirement', formatNumber(explanation.raw_order_quantity)],
                 [
@@ -121,6 +126,7 @@ export function ProductDrawer({ product, onClose }: { product: Product; onClose:
             <h3>Demand & forecast</h3>
             <DemandChart explanation={explanation} demo={ws.mode === 'demo'} months={6} />
           </div>
+          <DemandHistory key={product.recommendationId} explanation={explanation} unit={product.unit} />
           {explanation.warnings.length > 0 && (
             <div className="warning-box">
               <CircleAlert size={17} />

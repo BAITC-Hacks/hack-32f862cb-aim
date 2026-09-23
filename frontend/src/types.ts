@@ -73,8 +73,10 @@ export interface Explanation {
   warnings: string[]
   rounding: { minimum: string; multiple: string; conversion: string }
   cleaned_monthly_sales: { month: string; quantity: number }[]
+  raw_monthly_sales?: { month: string; quantity: number | null }[]
   daily_projection: { date: string; demand: number; incoming: number; balance_without_new_order: number }[]
-  outlier_exclusions: unknown[]
+  outlier_exclusions: { date: string; document: string; original: number; removed: number; method: string }[]
+  stockout_adjustments?: { month: string; added: number; method: string }[]
   sources: Record<string, unknown>
 }
 export interface OrderLine {

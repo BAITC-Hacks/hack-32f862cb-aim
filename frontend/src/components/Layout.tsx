@@ -436,7 +436,13 @@ export function Layout() {
         </footer>
       </div>
       <Suspense fallback={null}>
-        {product && <ProductDrawer key={product.id} product={product} onClose={() => setProduct(null)} />}
+        {product && (
+          <ProductDrawer
+            key={`${product.id}:${product.recommendationId ?? ''}`}
+            product={product}
+            onClose={() => setProduct(null)}
+          />
+        )}
       </Suspense>
       <Suspense fallback={null}>
         {importOpen && <ImportDialog onClose={() => setImportOpen(false)} />}

@@ -114,6 +114,16 @@ def test_entirely_blank_sales_are_not_evidence_of_zero_demand():
     assert "no_monthly_sales_history" in explanation["warnings"]
 
 
+def test_explanation_preserves_source_blanks_zeroes_and_future_cutoff():
+    item = product()
+    item.data["sales"].update({"2026-07-01": None, "2026-08-01": 0, "2026-09-01": 9000})
+    explanation = calculate(item, date(2026, 9, 22), Scenario())[3]
+    raw = {r["month"]: r["quantity"] for r in explanation["raw_monthly_sales"]}
+    assert raw["2026-07-01"] is None and raw["2026-08-01"] == 0
+    assert "2026-09-01" not in raw
+    assert item.data["sales"]["2026-07-01"] is None
+
+
 def test_sparse_demand_is_not_trimmed_to_zero_or_filled_as_stockout():
     sales = {f"2025-{m:02d}-01": 0 for m in range(1, 13)}
     sales["2025-12-01"] = 12

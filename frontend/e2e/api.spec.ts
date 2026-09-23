@@ -167,8 +167,17 @@ async function mockApi(page: Page, role = 'admin') {
           warnings: ['current_inventory_is_assumed'],
           rounding: { minimum: '10', multiple: '10', conversion: '1' },
           cleaned_monthly_sales: [{ month: '2026-08-01', quantity: 31 }],
+          raw_monthly_sales: [{ month: '2026-08-01', quantity: 100 }],
           daily_projection: [{ date: '2026-09-23', demand: 1, incoming: 0, balance_without_new_order: -1 }],
-          outlier_exclusions: [],
+          outlier_exclusions: [
+            {
+              date: '2026-08-14',
+              document: 'PROJECT-123',
+              original: 79,
+              removed: 69,
+              method: 'document_log_mad',
+            },
+          ],
           sources: {},
         },
       })
@@ -194,6 +203,9 @@ test('live API mapping, unknown stock, forecast, order revisions and export', as
   await expect(page.getByText('A120', { exact: true })).toHaveCount(0)
   await page.getByRole('button', { name: 'REAL-001', exact: true }).click()
   await expect(page.getByRole('dialog').getByText('Assumed inventory. Review sources.')).toBeVisible()
+  await expect(page.getByRole('dialog').getByText('Source sales', { exact: true })).toBeVisible()
+  await expect(page.getByRole('row', { name: '2026-08 100 31 -69' })).toBeVisible()
+  await expect(page.getByRole('dialog').getByText('PROJECT-123', { exact: true })).toBeVisible()
   await page.getByRole('button', { name: 'Close dialog' }).click()
   await page.getByRole('link', { name: 'Forecast', exact: true }).click()
   await page.getByRole('button', { name: 'Run analysis', exact: true }).click()

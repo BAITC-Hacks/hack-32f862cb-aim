@@ -258,6 +258,11 @@ def calculate(item, as_of: date, scenario: Scenario, commitments: list[dict] | N
         "commitments": commitments or [],
         "outlier_exclusions": exclusions,
         "stockout_adjustments": corrections,
+        "raw_monthly_sales": [
+            {"month": p, "quantity": rounded(q) if q is not None else None}
+            for p, q in sorted(data.get("sales", {}).items())
+            if p < as_of.replace(day=1).isoformat()
+        ],
         "cleaned_monthly_sales": [{"month": p, "quantity": rounded(q)} for p, q in sorted(history.items())],
         "daily_projection": simulated,
         "warnings": sorted(set(warnings)),

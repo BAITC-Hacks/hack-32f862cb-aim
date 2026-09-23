@@ -81,14 +81,17 @@ export function DemandChart({
   large?: boolean
 }) {
   const id = useId().replaceAll(':', '')
-  let chart: { month: string; actual?: number; forecast?: number }[] = []
+  let chart: { month: string; actual?: number; raw?: number | null; forecast?: number }[] = []
+  const hasRawSales = !demo && !!explanation?.raw_monthly_sales?.length
   if (explanation) {
+    const raw = new Map(explanation.raw_monthly_sales?.map((p) => [p.month, p.quantity]))
     chart = explanation.cleaned_monthly_sales.slice(-months).map((p, i) => ({
       month: new Date(p.month).toLocaleDateString('en-US', {
         month: 'short',
         year: large ? '2-digit' : undefined,
       }),
       actual: p.quantity,
+      ...(hasRawSales ? { raw: raw.get(p.month) } : {}),
       ...(demo ? { forecast: Math.round(p.quantity * (0.85 + i * 0.035)) } : {}),
     }))
     if (!demo) {
@@ -108,7 +111,8 @@ export function DemandChart({
       )
     }
   }
-  if (!chart.length) return <div className="chart-empty">Run a forecast to see the demand projection.</div>
+  if (!chart.length || !explanation?.cleaned_monthly_sales.length)
+    return <div className="chart-empty">No observed sales history for a demand forecast.</div>
   return (
     <div className={`demand-chart ${large ? 'chart-large' : ''}`}>
       <div className="chart-canvas">
@@ -142,13 +146,24 @@ export function DemandChart({
             <Area
               type="monotone"
               dataKey="actual"
-              name="Actual sales"
+              name={demo ? 'Actual sales' : 'Regular demand'}
               fill={`url(#${id})`}
               stroke="#7d83f5"
               strokeWidth={2}
               dot={{ r: 2, strokeWidth: 0, fill: '#9397ff' }}
               isAnimationActive={false}
             />
+            {hasRawSales && (
+              <Line
+                type="monotone"
+                dataKey="raw"
+                name="Source sales"
+                stroke="#dba76d"
+                strokeWidth={1.5}
+                dot={false}
+                isAnimationActive={false}
+              />
+            )}
             <Line
               type="monotone"
               dataKey="forecast"
@@ -165,8 +180,14 @@ export function DemandChart({
       <div className="chart-legend">
         <span>
           <i />
-          Actual sales
+          {demo ? 'Actual sales' : 'Regular demand'}
         </span>
+        {hasRawSales && (
+          <span>
+            <i style={{ background: '#dba76d' }} />
+            Source sales
+          </span>
+        )}
         <span>
           <i className="dashed" />
           Forecast

@@ -41,7 +41,8 @@ def review_plan(items, results, as_of, scenario, commitments, quality):
     supplier_groups = defaultdict(
         lambda: {"items": 0, "order_lines": 0, "critical": 0, "quantities": defaultdict(float)}
     )
-    excluded_documents = corrected_items = stockout_items = 0
+    corrected_documents = set()
+    outlier_corrections = corrected_items = stockout_items = 0
     changes = []
     for item, result in zip(items, results, strict=True):
         exp = result.explanation
@@ -52,7 +53,8 @@ def review_plan(items, results, as_of, scenario, commitments, quality):
         group["critical"] += int(result.risk == "critical")
         group["quantities"][item.unit] += float(result.quantity)
         exclusions = exp["outlier_exclusions"]
-        excluded_documents += len(exclusions)
+        outlier_corrections += len(exclusions)
+        corrected_documents.update((item.supplier, e["date"], e["document"]) for e in exclusions)
         corrected_items += bool(exclusions)
         stockout_items += bool(exp["stockout_adjustments"])
         if exclusions:
@@ -104,7 +106,7 @@ def review_plan(items, results, as_of, scenario, commitments, quality):
         )
     )
     return {
-        "agent_version": "procurement-workflow-v1",
+        "agent_version": "procurement-workflow-v2",
         "engine": "deterministic_tools",
         "decision": "review_required",
         "quality": quality,
@@ -112,7 +114,8 @@ def review_plan(items, results, as_of, scenario, commitments, quality):
             "items": len(results),
             "order_lines": sum(r.quantity > 0 for r in results),
             "critical_items": sum(r.risk == "critical" for r in results),
-            "excluded_documents": excluded_documents,
+            "excluded_documents": len(corrected_documents),
+            "outlier_corrections": outlier_corrections,
             "outlier_items": corrected_items,
             "stockout_items": stockout_items,
             "exception_items": len(exceptions),
@@ -140,7 +143,7 @@ def review_plan(items, results, as_of, scenario, commitments, quality):
             {
                 "key": "clean",
                 "title": "Регулярный спрос",
-                "detail": f"Скорректировано документов: {excluded_documents}; товаров с оценкой потерянного спроса: {stockout_items}.",
+                "detail": f"Скорректировано уникальных документов: {len(corrected_documents)}; поправок по товарам: {outlier_corrections}; товаров с оценкой потерянного спроса: {stockout_items}.",
             },
             {
                 "key": "calculate",

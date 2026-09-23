@@ -44,6 +44,7 @@ export function Agent() {
   const run = runs.find((r) => r.id === selectedId) ?? runs[0]
   const active = run?.status === 'queued' || run?.status === 'running'
   const complete = run?.status === 'succeeded'
+  const canExplain = !ws.loading && ws.planId === run?.plan_id
   const report = run?.report
   const readyDatasets = ws.datasets.filter((d) => d.status === 'ready')
   const update = <K extends keyof Scenario>(key: K, value: Scenario[K]) =>
@@ -109,6 +110,7 @@ export function Agent() {
   const stage = run?.job.progress.stage
   const activeStep = stage === 'reviewing' ? 3 : stage === 'calculating' ? 2 : 0
   function explain(itemId: string) {
+    if (!canExplain) return
     const product = ws.products.find((p) => p.id === itemId)
     if (product) showProduct(product)
   }
@@ -417,7 +419,7 @@ export function Agent() {
                       <button
                         className="agent-exception"
                         key={item.item_id}
-                        disabled={!ws.products.some((p) => p.id === item.item_id)}
+                        disabled={!canExplain || !ws.products.some((p) => p.id === item.item_id)}
                         onClick={() => explain(item.item_id)}
                       >
                         <div>
@@ -444,6 +446,7 @@ export function Agent() {
                       <button
                         className="agent-comparison"
                         key={item.item_id}
+                        disabled={!canExplain}
                         onClick={() => explain(item.item_id)}
                       >
                         <div>

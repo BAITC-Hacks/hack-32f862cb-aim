@@ -28,6 +28,18 @@ test('real procurement agent, persisted run, source explanation, approval and CS
   await page.locator('.agent-exception:not([disabled])').first().click()
   await expect(page.getByRole('dialog').getByText('Final recommendation')).toBeVisible()
   await page.getByRole('button', { name: 'Close dialog' }).click()
+  await page.getByRole('tab', { name: 'Разовые всплески' }).click()
+  await page.locator('.agent-comparison').first().click()
+  await expect(
+    page.getByRole('dialog').getByRole('heading', { name: 'Как выделен регулярный спрос' }),
+  ).toBeVisible()
+  await expect(page.getByRole('dialog').locator('.history-table-scroll tbody tr')).toHaveCount(12)
+  await expect(page.getByRole('dialog').locator('.history-corrections > div').first()).toBeVisible()
+  await page
+    .getByRole('dialog')
+    .locator('.demand-history')
+    .screenshot({ path: 'test-results/demand-history-live.png' })
+  await page.getByRole('button', { name: 'Close dialog' }).click()
   await page.getByRole('tab', { name: 'Заказы', exact: true }).click()
   await page.getByRole('link', { name: 'Проверить заказ' }).first().click()
   const dialog = page.getByRole('dialog')

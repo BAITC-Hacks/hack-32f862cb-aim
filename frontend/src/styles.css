@@ -2687,6 +2687,92 @@ tbody tr.selected {
 .detail-section {
   padding-top: 25px;
 }
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.history-table-scroll {
+  overflow-x: auto;
+  margin: 16px 0 22px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+.history-table-scroll table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11px;
+}
+.history-table-scroll th,
+.history-table-scroll td {
+  padding: 10px 12px;
+  text-align: right;
+  border-bottom: 1px solid var(--border-soft);
+  white-space: nowrap;
+}
+.history-table-scroll th:first-child {
+  text-align: left;
+}
+.history-table-scroll thead {
+  background: #20252c;
+  color: #b1bdce;
+}
+.history-table-scroll tbody th {
+  font-weight: 400;
+  color: var(--muted);
+}
+.history-adjusted {
+  color: #e3b16f;
+}
+.demand-history h4 {
+  font-size: 12px;
+  font-weight: 500;
+  margin: 20px 0 10px;
+}
+.history-corrections {
+  display: grid;
+  gap: 10px;
+  margin: 14px 0;
+}
+.history-corrections > div {
+  padding: 14px;
+  border: 1px solid var(--border);
+  background: #171c22;
+  border-radius: 8px;
+}
+.history-corrections strong {
+  display: block;
+  font-size: 11px;
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+.history-corrections span {
+  display: block;
+  font-size: 10px;
+  color: var(--muted);
+  margin-top: 6px;
+}
+.history-corrections dl {
+  margin: 12px 0 0;
+}
+.history-corrections dl > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 8px;
+  font-size: 10px;
+  line-height: 1.6;
+}
+.history-corrections dt {
+  color: var(--muted);
+}
+.history-corrections dd {
+  margin: 0;
+  white-space: nowrap;
+}
 .detail-section h3 {
   display: flex;
   gap: 8px;
