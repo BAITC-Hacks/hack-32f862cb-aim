@@ -182,6 +182,10 @@ def execute_job(identifier, token):
             sources = [
                 {"id": str(f.id), "name": f.name, "supplier": f.supplier, "sha256": f.sha256} for f in files
             ]
+    if kind == "assistant":
+        from optistock.assistant import execute_assistant
+
+        return execute_assistant(identifier, token, resource_id)
     if kind == "import":
         parsed, kinds = parse_sources(sources, as_of, lambda **p: progress_job(identifier, token, **p))
         with session() as db, db.begin():

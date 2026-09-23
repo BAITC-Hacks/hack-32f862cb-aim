@@ -24,6 +24,7 @@ from optistock.ingestion import store_file
 from optistock.middleware import BodyLimitMiddleware
 from optistock.models import (
     AgentRun,
+    AssistantRun,
     AuditEvent,
     Credential,
     Dataset,
@@ -35,7 +36,7 @@ from optistock.models import (
     Recommendation,
     SourceFile,
 )
-from optistock.schemas import CreatePlan, DraftOrders, EditOrder, OrderAction, SampleImport
+from optistock.schemas import AssistantRequest, CreatePlan, DraftOrders, EditOrder, OrderAction, SampleImport
 from optistock.services import (
     action_order,
     audit,
@@ -256,6 +257,10 @@ def job_status(identifier: uuid.UUID, db: DB, actor: Reader):
 def retry_job(identifier: uuid.UUID, key: Key, db: DB, actor: Planner):
     def retry():
         job = require(db, Job, identifier, locked=True)
+        if job.kind == "assistant":
+            raise DomainError(
+                "assistant_retry", "Повторите вопрос в AI-ассистенте: это новый запрос к модели", 409
+            )
         if job.status != "failed":
             raise DomainError(
                 "job_not_failed", "Перезапустить можно только завершившуюся ошибкой задачу", 409
@@ -556,6 +561,55 @@ def export_order(identifier: uuid.UUID, db: DB, actor: Reader):
             "Content-Disposition": f'attachment; filename="optistock-{identifier}-r{order.revision}.csv"'
         },
     )
+
+
+@app.get("/api/v1/assistant/status", tags=["AI Assistant"])
+def assistant_status(actor: Reader):
+    return {
+        "configured": bool(settings().openai_api_key.get_secret_value().strip()),
+        "model": settings().openai_model,
+        "requests_per_hour": settings().ai_requests_per_hour,
+        "operations": ["risks", "explain", "what_if"],
+        "function_calling": False,
+    }
+
+
+@app.post("/api/v1/assistant/runs", status_code=202, tags=["AI Assistant"])
+def create_assistant(payload: AssistantRequest, key: Key, db: DB, actor: Reader):
+    from optistock.assistant import enqueue_assistant
+
+    return mutate(
+        db,
+        actor,
+        "assistant",
+        key,
+        payload.model_dump(mode="json"),
+        lambda: enqueue_assistant(db, actor, payload),
+    )
+
+
+def assistant_view(db, run):
+    job = db.scalar(select(Job).where(Job.kind == "assistant", Job.resource_id == run.id))
+    return {**view(run), "job": view(job, exclude=("token",))}
+
+
+@app.get("/api/v1/assistant/runs", tags=["AI Assistant"])
+def assistant_runs(db: DB, actor: Reader, plan_id: uuid.UUID, limit: int = Query(20, ge=1, le=50)):
+    runs = db.scalars(
+        select(AssistantRun)
+        .where(AssistantRun.actor_id == actor.id, AssistantRun.plan_id == plan_id)
+        .order_by(AssistantRun.created_at.desc())
+        .limit(limit)
+    )
+    return {"items": [assistant_view(db, run) for run in runs]}
+
+
+@app.get("/api/v1/assistant/runs/{identifier}", tags=["AI Assistant"])
+def get_assistant(identifier: uuid.UUID, db: DB, actor: Reader):
+    run = require(db, AssistantRun, identifier)
+    if run.actor_id != actor.id:
+        raise DomainError("not_found", "Объект не найден", 404)
+    return assistant_view(db, run)
 
 
 @app.get("/api/v1/audit", tags=["Audit"])

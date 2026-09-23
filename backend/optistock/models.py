@@ -129,8 +129,22 @@ class Job(Entity, Base):
     finished_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     __table_args__ = (
         CheckConstraint("status IN ('queued','running','succeeded','failed')"),
-        CheckConstraint("kind IN ('import','plan')"),
+        CheckConstraint("kind IN ('import','plan','assistant')", name="jobs_kind_check"),
         Index("ix_jobs_poll", "status", "lease_until", "created_at"),
+    )
+
+
+class AssistantRun(Entity, Base):
+    __tablename__ = "assistant_runs"
+    actor_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("credentials.id"))
+    plan_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("plans.id"))
+    status: Mapped[str] = mapped_column(String(20), default="queued")
+    request: Mapped[dict] = mapped_column(JSONB)
+    result: Mapped[dict] = mapped_column(JSONB, default=dict)
+    model: Mapped[str] = mapped_column(String(100))
+    __table_args__ = (
+        Index("ix_assistant_runs_actor_created", "actor_id", "created_at"),
+        CheckConstraint("status IN ('queued','running','ready','failed')"),
     )
 
 

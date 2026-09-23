@@ -16,10 +16,14 @@ from sqlalchemy import or_, select, update
 from optistock.config import settings
 from optistock.db import session
 from optistock.errors import DomainError, LeaseLost
-from optistock.models import Dataset, Job, Plan, utcnow
+from optistock.models import AssistantRun, Dataset, Job, Plan, utcnow
 from optistock.services import execute_job
 
 log = logging.getLogger("optistock.worker")
+
+
+def resource_model(kind):
+    return {"import": Dataset, "plan": Plan, "assistant": AssistantRun}[kind]
 
 
 def claim():
@@ -33,7 +37,7 @@ def claim():
         )
         if not job:
             return None
-        resource = db.get(Dataset if job.kind == "import" else Plan, job.resource_id)
+        resource = db.get(resource_model(job.kind), job.resource_id)
         if job.attempts >= settings().max_attempts:
             job.status, job.finished_at = "failed", utcnow()
             job.error = {
@@ -78,7 +82,7 @@ def fail(identifier, token, error, retry=False):
         job.lease_until = None
         if job.status == "failed":
             job.finished_at = utcnow()
-        db.get(Dataset if job.kind == "import" else Plan, job.resource_id).status = job.status
+        db.get(resource_model(job.kind), job.resource_id).status = job.status
 
 
 def run_child(identifier, token):

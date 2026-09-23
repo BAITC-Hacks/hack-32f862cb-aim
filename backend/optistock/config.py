@@ -1,7 +1,7 @@
 from functools import lru_cache
 from pathlib import Path
 
-from pydantic import Field
+from pydantic import Field, SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -17,6 +17,10 @@ class Settings(BaseSettings):
     lease_seconds: int = Field(default=60, ge=10)
     job_timeout_seconds: int = Field(default=900, ge=30)
     max_attempts: int = Field(default=3, ge=1, le=10)
+    openai_api_key: SecretStr = SecretStr("")
+    openai_model: str = "gpt-5.4-mini-2026-03-17"
+    ai_timeout_seconds: int = Field(default=45, ge=5, le=120)
+    ai_requests_per_hour: int = Field(default=30, ge=1, le=300)
 
 
 @lru_cache

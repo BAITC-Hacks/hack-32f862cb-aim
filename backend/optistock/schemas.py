@@ -60,3 +60,13 @@ class EditOrder(StrictModel):
 
 class OrderAction(StrictModel):
     revision: int = Field(ge=1)
+
+
+class AssistantRequest(StrictModel):
+    plan_id: UUID
+    task: Literal["risks", "explain", "what_if"] = "risks"
+    item_id: UUID | None = None
+    question: str = Field(
+        default="Объясни результат и предложи следующие действия.", min_length=3, max_length=2000
+    )
+    scenario: Scenario | None = None
