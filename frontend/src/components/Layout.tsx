@@ -1,3 +1,4 @@
+import { getNumberLocale, formatDateTime, t, useLanguage } from '../i18n'
 import { lazy, Suspense, useEffect, useRef, useState } from 'react'
 import {
   Activity,
@@ -29,6 +30,7 @@ import { Link, NavLink, Outlet, useNavigate, useOutletContext } from 'react-rout
 import { useWorkspace } from '../store'
 import { supplierName } from '../lib/format'
 import type { Product } from '../types'
+import { LanguageSelector } from './LanguageSelector'
 import { Badge, Button, IconButton, InlineError, Loading } from './ui'
 const ProductDrawer = lazy(() => import('./ProductDrawer').then((m) => ({ default: m.ProductDrawer })))
 const ImportDialog = lazy(() => import('./ImportDialog').then((m) => ({ default: m.ImportDialog })))
@@ -52,6 +54,7 @@ export function useShell() {
 }
 
 export function Layout() {
+  useLanguage()
   const ws = useWorkspace()
   const navigate = useNavigate()
   const [product, setProduct] = useState<Product | null>(null)
@@ -99,13 +102,17 @@ export function Layout() {
   return (
     <div className="app-shell">
       <a className="skip-link" href="#main-content">
-        Skip to main content
+        {t('Skip to main content')}
       </a>
       {sidebar && (
-        <button className="sidebar-scrim" aria-label="Close navigation" onClick={() => setSidebar(false)} />
+        <button
+          className="sidebar-scrim"
+          aria-label={t('Close navigation')}
+          onClick={() => setSidebar(false)}
+        />
       )}
       <aside className={`sidebar ${sidebar ? 'sidebar-open' : ''}`}>
-        <Link to="/" className="brand" aria-label="OptiStock dashboard">
+        <Link to="/" className="brand" aria-label={t('OptiStock dashboard')}>
           <svg viewBox="0 0 36 40" fill="none" aria-hidden="true">
             <path d="M18 1 34 10v20L18 39 2 30V10L18 1Z" fill="#f3f4f6" />
             <path d="m18 9 9 5-9 5-9-5 9-5Zm-9 8 7 4v10l-7-4V17Zm18 0v10l-7 4V21l7-4Z" fill="#101215" />
@@ -115,16 +122,16 @@ export function Layout() {
         <div className="sidebar-search">
           <Search size={16} />
           <input
-            aria-label="Search navigation"
-            placeholder="Search..."
+            aria-label={t('Search navigation')}
+            placeholder={t('Search...')}
             value={navQuery}
             onChange={(e) => setNavQuery(e.target.value)}
           />
           <kbd>⌘ K</kbd>
         </div>
-        <nav aria-label="Main navigation">
+        <nav aria-label={t('Main navigation')}>
           {navigation
-            .filter((n) => n.label.toLowerCase().includes(navQuery.toLowerCase()))
+            .filter((n) => t(n.label).toLowerCase().includes(navQuery.toLowerCase()))
             .map(({ to, label, icon: Icon }) => (
               <NavLink
                 key={to}
@@ -134,8 +141,8 @@ export function Layout() {
                 className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
               >
                 <Icon size={18} strokeWidth={1.5} />
-                <span>{label}</span>
-                {label === 'Orders' && ws.orders.filter((o) => o.status === 'draft').length > 0 && (
+                <span>{t(label)}</span>
+                {to === '/orders' && ws.orders.filter((o) => o.status === 'draft').length > 0 && (
                   <small>{ws.orders.filter((o) => o.status === 'draft').length}</small>
                 )}
               </NavLink>
@@ -148,19 +155,19 @@ export function Layout() {
             onClick={() => setSidebar(false)}
           >
             <Settings size={18} strokeWidth={1.5} />
-            <span>Settings</span>
+            <span>{t('Settings')}</span>
           </NavLink>
           <div className="workspace-card">
             <div className="workspace-card-title">
               <span className={`connection-dot ${ws.mode}`} />
-              {ws.mode === 'demo' ? 'Explore your workspace' : 'Workspace connected'}
+              {ws.mode === 'demo' ? t('Explore your workspace') : t('Workspace connected')}
             </div>
             <p>
               {ws.mode === 'demo'
-                ? 'Your next great decision starts with better data.'
-                : `${ws.products.length.toLocaleString()} products, one clear picture.`}
+                ? t('Your next great decision starts with better data.')
+                : t`${ws.products.length.toLocaleString(getNumberLocale())} products, one clear picture.`}
             </p>
-            <Link to="/settings" aria-label="Workspace settings">
+            <Link to="/settings" aria-label={t('Workspace settings')}>
               <ArrowRight size={18} />
             </Link>
           </div>
@@ -174,7 +181,7 @@ export function Layout() {
             </div>
             <div>
               <strong>{ws.user.name}</strong>
-              <span>{ws.mode === 'demo' ? 'Procurement Manager' : ws.user.role}</span>
+              <span>{ws.mode === 'demo' ? t('Procurement Manager') : t(ws.user.role)}</span>
             </div>
             <ChevronDown size={14} />
           </Link>
@@ -185,7 +192,7 @@ export function Layout() {
           <IconButton
             className="mobile-menu"
             icon={Menu}
-            label="Open navigation"
+            label={t('Open navigation')}
             onClick={() => setSidebar(true)}
           />
           <div className="global-search">
@@ -198,8 +205,8 @@ export function Layout() {
                 setSearchOpen(true)
               }}
               onFocus={() => setSearchOpen(true)}
-              aria-label="Global search"
-              placeholder="Search for SKU, product, supplier..."
+              aria-label={t('Global search')}
+              placeholder={t('Search for SKU, product, supplier...')}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' && results[0]) {
                   e.preventDefault()
@@ -213,11 +220,13 @@ export function Layout() {
                 <button
                   className="popover-scrim"
                   tabIndex={-1}
-                  aria-label="Close search"
+                  aria-label={t('Close search')}
                   onClick={() => setSearchOpen(false)}
                 />
                 <div className="search-results">
-                  <div className="popover-title">{query ? 'Search results' : 'Quick access to products'}</div>
+                  <div className="popover-title">
+                    {query ? t('Search results') : t('Quick access to products')}
+                  </div>
                   {results.length ? (
                     results.map((p) => (
                       <button key={p.id} onClick={() => selectProduct(p)}>
@@ -234,24 +243,25 @@ export function Layout() {
                       </button>
                     ))
                   ) : (
-                    <p>No products match your search.</p>
+                    <p>{t('No products match your search.')}</p>
                   )}
                   <div className="search-hint">
-                    <kbd>Enter</kbd> to open the first result <kbd>Esc</kbd> to close
+                    <kbd>Enter</kbd> {t('to open the first result')} <kbd>Esc</kbd> {t('to close')}
                   </div>
                 </div>
               </>
             )}
           </div>
           <div className="topbar-actions">
+            <LanguageSelector compact />
             <Link to="/settings" className={`mode-chip ${ws.mode}`}>
               <span className="connection-dot" />
-              {ws.mode === 'demo' ? 'Demo workspace' : 'Connected'}
+              {ws.mode === 'demo' ? t('Demo workspace') : t('Connected')}
             </Link>
             <div className="popover-anchor">
               <button
                 className="icon-button notification-button"
-                aria-label="Notifications"
+                aria-label={t('Notifications')}
                 aria-expanded={notificationsOpen}
                 onClick={() => {
                   setNotificationsOpen((v) => !v)
@@ -265,11 +275,11 @@ export function Layout() {
                 <>
                   <button
                     className="popover-scrim"
-                    aria-label="Close notifications"
+                    aria-label={t('Close notifications')}
                     onClick={() => setNotificationsOpen(false)}
                   />
                   <div className="notification-popover">
-                    <div className="popover-title">Your inventory pulse</div>
+                    <div className="popover-title">{t('Your inventory pulse')}</div>
                     <button
                       onClick={() => {
                         navigate('/inventory?risk=critical')
@@ -280,8 +290,10 @@ export function Layout() {
                         <Package size={17} />
                       </span>
                       <span>
-                        <strong>{critical} products need attention</strong>
-                        <small>Review critical stock levels</small>
+                        <strong>
+                          {critical} {t('products need attention')}
+                        </strong>
+                        <small>{t('Review critical stock levels')}</small>
                       </span>
                       <ArrowRight size={15} />
                     </button>
@@ -295,8 +307,10 @@ export function Layout() {
                         <Activity size={17} />
                       </span>
                       <span>
-                        <strong>{anomalies} products have data warnings</strong>
-                        <small>Review forecasting assumptions</small>
+                        <strong>
+                          {anomalies} {t('products have data warnings')}
+                        </strong>
+                        <small>{t('Review forecasting assumptions')}</small>
                       </span>
                       <ArrowRight size={15} />
                     </button>
@@ -311,9 +325,9 @@ export function Layout() {
                       </span>
                       <span>
                         <strong>
-                          {ws.orders.filter((o) => o.status === 'draft').length} drafts awaiting review
+                          {ws.orders.filter((o) => o.status === 'draft').length} {t('drafts awaiting review')}
                         </strong>
-                        <small>Keep your supply chain moving</small>
+                        <small>{t('Keep your supply chain moving')}</small>
                       </span>
                       <ArrowRight size={15} />
                     </button>
@@ -323,10 +337,8 @@ export function Layout() {
             </div>
             <div className="topbar-date">
               <CalendarDays size={15} />
-              <span>
-                {now.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-              </span>
-              <span>{now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}</span>
+              <span>{formatDateTime(now, { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+              <span>{formatDateTime(now, { hour: '2-digit', minute: '2-digit' })}</span>
             </div>
             <div className="popover-anchor">
               <Button
@@ -338,14 +350,14 @@ export function Layout() {
                 }}
                 aria-expanded={addOpen}
               >
-                Add New
+                {t('Add New')}
                 <ChevronDown size={14} />
               </Button>
               {addOpen && (
                 <>
                   <button
                     className="popover-scrim"
-                    aria-label="Close add menu"
+                    aria-label={t('Close add menu')}
                     onClick={() => setAddOpen(false)}
                   />
                   <div className="add-menu">
@@ -356,7 +368,7 @@ export function Layout() {
                       }}
                     >
                       <UploadCloud size={17} />
-                      Import inventory
+                      {t('Import inventory')}
                     </button>
                     <button
                       onClick={() => {
@@ -365,7 +377,7 @@ export function Layout() {
                       }}
                     >
                       <Sparkles size={17} />
-                      Create forecast
+                      {t('Create forecast')}
                     </button>
                     <button
                       onClick={() => {
@@ -374,7 +386,7 @@ export function Layout() {
                       }}
                     >
                       <ShoppingCart size={17} />
-                      Create purchase orders
+                      {t('Create purchase orders')}
                     </button>
                   </div>
                 </>
@@ -395,8 +407,8 @@ export function Layout() {
             <div className="job-banner" role="status">
               <span className="connection-dot live" />
               {ws.job?.status === 'running' || ws.job?.status === 'queued'
-                ? `Processing ${ws.job.kind}: ${ws.job.progress.stage || ws.job.status}`
-                : 'Saving your changes…'}
+                ? t`Processing ${t(ws.job.kind)}: ${t(ws.job.progress.stage || ws.job.status)}`
+                : t('Saving your changes…')}
               {ws.job?.progress.total != null && (
                 <span>
                   {ws.job.progress.processed ?? 0} / {ws.job.progress.total}
@@ -406,7 +418,7 @@ export function Layout() {
           )}
           {ws.job?.status === 'failed' && !ws.busy && (
             <InlineError
-              message={ws.job.error?.message || 'Processing failed.'}
+              message={ws.job.error?.message || t('Processing failed.')}
               retry={() => {
                 void ws.retryJob().catch(() => {})
               }}
@@ -427,11 +439,11 @@ export function Layout() {
         <footer className="app-footer">
           <span>
             <Box size={12} />
-            OptiStock <span className="footer-dot">·</span> Smarter inventory. Better decisions.
+            OptiStock <span className="footer-dot">·</span> {t('Smarter inventory. Better decisions.')}
           </span>
           <Link to="/settings">
             <CircleHelp size={13} />
-            Workspace settings
+            {t('Workspace settings')}
           </Link>
         </footer>
       </div>
@@ -451,8 +463,8 @@ export function Layout() {
         {ws.notices.map((n) => (
           <div key={n.id} className={`toast toast-${n.kind}`} role={n.kind === 'error' ? 'alert' : 'status'}>
             {n.kind === 'success' ? <Check size={18} /> : <Database size={18} />}
-            <span>{n.message}</span>
-            <button onClick={() => ws.dismissNotice(n.id)} aria-label="Dismiss notification">
+            <span>{t(n.message)}</span>
+            <button onClick={() => ws.dismissNotice(n.id)} aria-label={t('Dismiss notification')}>
               <X size={15} />
             </button>
           </div>

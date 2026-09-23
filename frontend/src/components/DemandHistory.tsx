@@ -1,8 +1,10 @@
+import { t, useLanguage } from '../i18n'
 import { useState } from 'react'
 import type { Explanation } from '../types'
 import { formatNumber } from '../lib/format'
 
 export function DemandHistory({ explanation, unit }: { explanation: Explanation; unit: string }) {
+  useLanguage()
   const [showAll, setShowAll] = useState(false)
   const raw = explanation.raw_monthly_sales
   const cleaned = new Map(explanation.cleaned_monthly_sales.map((row) => [row.month, row.quantity]))
@@ -10,22 +12,24 @@ export function DemandHistory({ explanation, unit }: { explanation: Explanation;
   const stockouts = explanation.stockout_adjustments ?? []
   return (
     <section className="detail-section demand-history">
-      <h3>Как выделен регулярный спрос</h3>
+      <h3>{t('Как выделен регулярный спрос')}</h3>
       {raw?.length ? (
         <>
           <p className="detail-note">
-            Последние 12 завершённых месяцев, {unit}. Пропуск отличается от нуля. Столбец «В расчёт» включает
-            очистку всплесков и включённую оценку потерянного спроса.
+            {t('Последние 12 завершённых месяцев,')} {unit}
+            {t(
+              '. Пропуск отличается от нуля. Столбец «В расчёт» включает очистку всплесков и включённую оценку потерянного спроса.',
+            )}
           </p>
           <div className="history-table-scroll">
             <table>
-              <caption className="sr-only">Исходные продажи и спрос после обработки</caption>
+              <caption className="sr-only">{t('Исходные продажи и спрос после обработки')}</caption>
               <thead>
                 <tr>
-                  <th scope="col">Месяц</th>
-                  <th scope="col">Из Excel</th>
-                  <th scope="col">В расчёт</th>
-                  <th scope="col">Изменение</th>
+                  <th scope="col">{t('Месяц')}</th>
+                  <th scope="col">{t('Из Excel')}</th>
+                  <th scope="col">{t('В расчёт')}</th>
+                  <th scope="col">{t('Изменение')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -49,14 +53,18 @@ export function DemandHistory({ explanation, unit }: { explanation: Explanation;
         </>
       ) : (
         <p className="detail-note">
-          Сохранённый расчёт не содержит исходный месячный ряд. Новый запуск агента сохранит обе версии для
-          сравнения.
+          {t(
+            'Сохранённый расчёт не содержит исходный месячный ряд. Новый запуск агента сохранит обе версии для сравнения.',
+          )}
         </p>
       )}
-      <h4>Поправки по документам · {corrections.length}</h4>
+      <h4>
+        {t('Поправки по документам ·')} {corrections.length}
+      </h4>
       <p className="detail-note">
-        Агент вычитает только избыточную часть разовой продажи после сверки месячного итога. Регулярные
-        крупные покупки сохраняются.
+        {t(
+          'Агент вычитает только избыточную часть разовой продажи после сверки месячного итога. Регулярные крупные покупки сохраняются.',
+        )}
       </p>
       {corrections.length ? (
         <>
@@ -67,13 +75,13 @@ export function DemandHistory({ explanation, unit }: { explanation: Explanation;
                 <span>{row.date}</span>
                 <dl>
                   <div>
-                    <dt>Количество в документе</dt>
+                    <dt>{t('Количество в документе')}</dt>
                     <dd>
                       {formatNumber(row.original)} {unit}
                     </dd>
                   </div>
                   <div>
-                    <dt>Исключено из регулярного спроса</dt>
+                    <dt>{t('Исключено из регулярного спроса')}</dt>
                     <dd>
                       {formatNumber(row.removed)} {unit}
                     </dd>
@@ -84,17 +92,19 @@ export function DemandHistory({ explanation, unit }: { explanation: Explanation;
           </div>
           {corrections.length > 10 && (
             <button className="text-link" onClick={() => setShowAll((value) => !value)}>
-              {showAll ? 'Свернуть' : `Все поправки (${corrections.length})`}
+              {showAll ? t('Свернуть') : t`Все поправки (${corrections.length})`}
             </button>
           )}
         </>
       ) : (
-        <p className="detail-note">Документных поправок в этом расчёте нет.</p>
+        <p className="detail-note">{t('Документных поправок в этом расчёте нет.')}</p>
       )}
       {stockouts.length > 0 && (
         <details className="source-details">
-          <summary>Оценка потерянного спроса · {stockouts.length} месяцев</summary>
-          <p>Приближение по нулевым месячным снимкам; не подтверждённые потерянные продажи.</p>
+          <summary>
+            {t('Оценка потерянного спроса ·')} {stockouts.length} {t('месяцев')}
+          </summary>
+          <p>{t('Приближение по нулевым месячным снимкам; не подтверждённые потерянные продажи.')}</p>
           <ul>
             {stockouts.map((row) => (
               <li key={row.month}>

@@ -1,3 +1,4 @@
+import { t, useLanguage } from './i18n'
 import { lazy } from 'react'
 import { BrowserRouter, Link, Route, Routes } from 'react-router-dom'
 import { WorkspaceProvider } from './store'
@@ -15,6 +16,7 @@ const Settings = lazy(() => import('./pages/Settings').then((m) => ({ default: m
 const Agent = lazy(() => import('./pages/Agent').then((m) => ({ default: m.Agent })))
 
 export default function App() {
+  useLanguage()
   return (
     <BrowserRouter>
       <WorkspaceProvider>
@@ -33,11 +35,11 @@ export default function App() {
               path="*"
               element={
                 <EmptyState
-                  title="This page isn't in your workspace"
-                  description="Head back to your dashboard to find what you need."
+                  title={t("This page isn't in your workspace")}
+                  description={t('Head back to your dashboard to find what you need.')}
                   action={
                     <Link className="button button-primary" to="/">
-                      Back to dashboard
+                      {t('Back to dashboard')}
                     </Link>
                   }
                 />

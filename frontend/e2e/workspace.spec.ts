@@ -47,7 +47,7 @@ test('order quantity validation, revision, approval, export and persistence', as
   await modal
     .getByRole('textbox', { name: 'Reason for changing quantities' })
     .fill('Confirmed project requirement')
-  await modal.getByRole('button', { name: 'Save 1 changes' }).click()
+  await modal.getByRole('button', { name: 'Save changes (1)' }).click()
   await expect(modal.getByText('v2', { exact: true })).toBeVisible()
   await modal.getByRole('button', { name: 'Approve order', exact: true }).click()
   await expect(modal.getByText('Approved', { exact: true })).toBeVisible()

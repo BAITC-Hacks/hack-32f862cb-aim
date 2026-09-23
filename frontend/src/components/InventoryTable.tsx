@@ -1,3 +1,4 @@
+import { t, useLanguage } from '../i18n'
 import { useMemo, useState } from 'react'
 import {
   ArrowDownUp,
@@ -22,6 +23,7 @@ export function InventoryTable({
   compact?: boolean
   onSelect: (product: Product) => void
 }) {
+  useLanguage()
   const { products, mode, notify } = useWorkspace()
   const [params, setParams] = useSearchParams()
   const [query, setQuery] = useState('')
@@ -80,12 +82,21 @@ export function InventoryTable({
     const rows = selectedRows.length ? selectedRows : filtered
     downloadBlob(
       csvBlob([
-        ['SKU', 'Product', 'Supplier', 'Scope', 'Stock', 'Unit', 'Recommended', 'Status'],
+        [
+          'SKU',
+          t('Product'),
+          t('Supplier'),
+          t('Scope'),
+          t('Stock'),
+          t('Unit'),
+          t('Recommended'),
+          t('Status'),
+        ],
         ...rows.map((p) => [
           p.code,
           p.name,
           supplierName(p.supplier),
-          p.warehouse || 'Supplier aggregate',
+          p.warehouse || t('Supplier aggregate'),
           p.available,
           p.unit,
           p.recommended,
@@ -94,7 +105,7 @@ export function InventoryTable({
       ]),
       'optistock-inventory.csv',
     )
-    notify(`${rows.length} inventory rows exported.`)
+    notify(t`${rows.length} inventory rows exported.`)
   }
   const sortBy = (key: 'code' | 'available' | 'recommended') =>
     setSort((s) => ({ key, desc: s?.key === key ? !s.desc : false }))
@@ -102,11 +113,11 @@ export function InventoryTable({
     <section className={`panel inventory-panel ${compact ? 'inventory-compact' : ''}`}>
       <div className="inventory-toolbar">
         <div className="inventory-title-group">
-          <h2>{compact ? 'Inventory List' : 'All products'}</h2>
-          <div className="status-tabs" aria-label="Inventory status">
+          <h2>{compact ? t('Inventory List') : t('All products')}</h2>
+          <div className="status-tabs" aria-label={t('Inventory status')}>
             {['all', 'critical', 'reorder', 'covered', ...(compact ? [] : ['insufficient_data'])].map((r) => (
               <button key={r} className={risk === r ? 'active' : ''} onClick={() => changeRisk(r)}>
-                {r === 'all' ? 'All' : riskLabels[r as Risk]}{' '}
+                {r === 'all' ? t('All') : riskLabels[r as Risk]}{' '}
                 <span>
                   ({formatNumber(r === 'all' ? products.length : products.filter((p) => p.risk === r).length)}
                   )
@@ -129,17 +140,18 @@ export function InventoryTable({
             aria-expanded={filters}
             className={supplier || warehouse ? 'is-filtered' : ''}
           >
-            Filter
+            {t('Filter')}
           </Button>
           <Button icon={Download} onClick={exportRows} disabled={!filtered.length}>
-            Export{selectedRows.length ? ` (${selectedRows.length})` : ''}
+            {t('Export')}
+            {selectedRows.length ? ` (${selectedRows.length})` : ''}
           </Button>
         </div>
       </div>
       {filters && (
         <div className="filter-row">
           <label>
-            Supplier
+            {t('Supplier')}
             <select
               value={supplier}
               onChange={(e) => {
@@ -147,7 +159,7 @@ export function InventoryTable({
                 setPage(0)
               }}
             >
-              <option value="">All suppliers</option>
+              <option value="">{t('All suppliers')}</option>
               {[...new Set(products.map((p) => p.supplier))].map((s) => (
                 <option key={s} value={s}>
                   {supplierName(s)}
@@ -157,7 +169,7 @@ export function InventoryTable({
           </label>
           {mode === 'demo' && (
             <label>
-              Warehouse
+              {t('Warehouse')}
               <select
                 value={warehouse}
                 onChange={(e) => {
@@ -165,7 +177,7 @@ export function InventoryTable({
                   setPage(0)
                 }}
               >
-                <option value="">All warehouses</option>
+                <option value="">{t('All warehouses')}</option>
                 {[...new Set(products.map((p) => p.warehouse))].map((s) => (
                   <option key={s}>{s}</option>
                 ))}
@@ -182,7 +194,7 @@ export function InventoryTable({
               changeRisk('all')
             }}
           >
-            Clear filters
+            {t('Clear filters')}
           </Button>
         </div>
       )}
@@ -192,7 +204,7 @@ export function InventoryTable({
             <tr>
               <th className="checkbox-cell">
                 <input
-                  aria-label="Select all visible products"
+                  aria-label={t('Select all visible products')}
                   type="checkbox"
                   checked={allSelected}
                   onChange={() =>
@@ -209,22 +221,22 @@ export function InventoryTable({
                   SKU <ArrowDownUp size={11} />
                 </button>
               </th>
-              <th>Product</th>
-              <th>{mode === 'demo' ? 'Warehouse' : 'Category'}</th>
-              <th>Supplier</th>
+              <th>{t('Product')}</th>
+              <th>{mode === 'demo' ? t('Warehouse') : t('Category')}</th>
+              <th>{t('Supplier')}</th>
               <th>
                 <button onClick={() => sortBy('available')}>
-                  Current Stock <ArrowDownUp size={11} />
+                  {t('Current Stock')} <ArrowDownUp size={11} />
                 </button>
               </th>
-              {!compact && <th>Unit</th>}
+              {!compact && <th>{t('Unit')}</th>}
               <th>
                 <button onClick={() => sortBy('recommended')}>
-                  Recommended <ArrowDownUp size={11} />
+                  {t('Recommended')} <ArrowDownUp size={11} />
                 </button>
               </th>
-              <th>Status</th>
-              <th>Action</th>
+              <th>{t('Status')}</th>
+              <th>{t('Action')}</th>
             </tr>
           </thead>
           <tbody>
@@ -233,7 +245,7 @@ export function InventoryTable({
                 <td className="checkbox-cell">
                   <input
                     type="checkbox"
-                    aria-label={`Select ${p.code}`}
+                    aria-label={t`Select ${p.code}`}
                     checked={selected.has(p.id)}
                     onChange={() => toggle(p.id)}
                   />
@@ -263,7 +275,7 @@ export function InventoryTable({
                 </td>
                 <td>
                   <button className="text-link" onClick={() => onSelect(p)}>
-                    View <ArrowRight size={14} />
+                    {t('View')} <ArrowRight size={14} />
                   </button>
                 </td>
               </tr>
@@ -273,8 +285,8 @@ export function InventoryTable({
       </div>
       {!filtered.length && (
         <EmptyState
-          title="No products found"
-          description="Try a different search or clear your filters."
+          title={t('No products found')}
+          description={t('Try a different search or clear your filters.')}
           action={
             <Button
               onClick={() => {
@@ -284,7 +296,7 @@ export function InventoryTable({
                 changeRisk('all')
               }}
             >
-              Clear filters
+              {t('Clear filters')}
             </Button>
           }
         />
@@ -292,13 +304,17 @@ export function InventoryTable({
       {!compact && (
         <div className="table-footer">
           <span>
-            Showing {filtered.length ? currentPage * pageSize + 1 : 0}–
-            {Math.min((currentPage + 1) * pageSize, filtered.length)} of {formatNumber(filtered.length)}{' '}
-            products{selectedRows.length ? ` · ${selectedRows.length} selected` : ''}
+            {t(
+              'Showing {0}–{1} of {2} products',
+              filtered.length ? currentPage * pageSize + 1 : 0,
+              Math.min((currentPage + 1) * pageSize, filtered.length),
+              formatNumber(filtered.length),
+            )}
+            {selectedRows.length ? t` · ${selectedRows.length} selected` : ''}
           </span>
           <div className="pagination">
             <button
-              aria-label="Previous page"
+              aria-label={t('Previous page')}
               disabled={currentPage === 0}
               onClick={() => setPage(currentPage - 1)}
             >
@@ -308,7 +324,7 @@ export function InventoryTable({
               {currentPage + 1} / {maxPage + 1}
             </span>
             <button
-              aria-label="Next page"
+              aria-label={t('Next page')}
               disabled={currentPage === maxPage}
               onClick={() => setPage(currentPage + 1)}
             >

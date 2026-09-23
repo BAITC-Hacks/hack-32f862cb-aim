@@ -1,3 +1,4 @@
+import { getNumberLocale, formatDateTime, t, useLanguage } from '../i18n'
 import { useState } from 'react'
 import {
   Activity,
@@ -13,22 +14,23 @@ import { csvBlob, downloadBlob, formatDate, riskLabels, supplierName } from '../
 import { Badge, Button, EmptyState, PageHeader, Panel, SearchInput } from '../components/ui'
 
 export function Reports() {
+  useLanguage()
   const ws = useWorkspace()
   const [query, setQuery] = useState('')
   const [eventType, setEventType] = useState('all')
   const events = ws.events.filter(
     (e) =>
       (eventType === 'all' || e.action.startsWith(eventType)) &&
-      `${e.action} ${e.entity_id}`.toLowerCase().includes(query.toLowerCase()),
+      `${t(e.action)} ${e.action} ${e.entity_id}`.toLowerCase().includes(query.toLowerCase()),
   )
   const reports = [
     {
-      title: 'Inventory snapshot',
-      description: 'A complete catalog with stock levels, supplier details and current risk.',
+      title: t('Inventory snapshot'),
+      description: t('A complete catalog with stock levels, supplier details and current risk.'),
       icon: FileSpreadsheet,
       name: 'inventory',
       rows: [
-        ['SKU', 'Product', 'Supplier', 'Stock', 'Unit', 'Status'],
+        ['SKU', t('Product'), t('Supplier'), t('Stock'), t('Unit'), t('Status')],
         ...ws.products.map((p) => [
           p.code,
           p.name,
@@ -40,12 +42,12 @@ export function Reports() {
       ],
     },
     {
-      title: 'Purchase recommendations',
-      description: 'Recommended quantities and assumptions from your active planning run.',
+      title: t('Purchase recommendations'),
+      description: t('Recommended quantities and assumptions from your active planning run.'),
       icon: ClipboardList,
       name: 'recommendations',
       rows: [
-        ['SKU', 'Product', 'Supplier', 'Recommended quantity', 'Unit', 'Risk', 'Warnings'],
+        ['SKU', t('Product'), t('Supplier'), t('Recommended quantity'), t('Unit'), t('Risk'), t('Warnings')],
         ...ws.products
           .filter((p) => p.recommendationId)
           .map((p) => [
@@ -55,17 +57,17 @@ export function Reports() {
             p.recommended,
             p.unit,
             riskLabels[p.risk],
-            p.warnings.join(', '),
+            p.warnings.map((warning) => t(warning)).join(', '),
           ]),
       ],
     },
     {
-      title: 'Activity & decision log',
-      description: 'A traceable history of imports, calculations and purchase decisions.',
+      title: t('Activity & decision log'),
+      description: t('A traceable history of imports, calculations and purchase decisions.'),
       icon: History,
       name: 'activity',
       rows: [
-        ['Date', 'Action', 'Entity', 'Details'],
+        [t('Date'), t('Action'), t('Entity'), t('Details')],
         ...ws.events.map((e) => [e.created_at, e.action, e.entity_id, JSON.stringify(e.details)]),
       ],
     },
@@ -73,9 +75,9 @@ export function Reports() {
   return (
     <div className="page">
       <PageHeader
-        eyebrow="Workspace / Reports"
-        title="Good decisions leave a trail."
-        description="Export the data you need and follow every change across your workspace."
+        eyebrow={t('Workspace / Reports')}
+        title={t('Good decisions leave a trail.')}
+        description={t('Export the data you need and follow every change across your workspace.')}
       />
       <div className="report-grid">
         {reports.map((r) => (
@@ -87,45 +89,47 @@ export function Reports() {
             <h2>{r.title}</h2>
             <p>{r.description}</p>
             <div>
-              <span>{(r.rows.length - 1).toLocaleString()} records</span>
+              <span>
+                {(r.rows.length - 1).toLocaleString(getNumberLocale())} {t('records')}
+              </span>
               <Button
                 icon={ArrowDownToLine}
                 disabled={r.rows.length < 2}
                 onClick={() => {
                   downloadBlob(csvBlob(r.rows), `optistock-${r.name}.csv`)
-                  ws.notify(`${r.title} exported.`)
+                  ws.notify(t`${r.title} exported.`)
                 }}
               >
-                Download
+                {t('Download')}
               </Button>
             </div>
           </section>
         ))}
       </div>
-      <Panel title="Dataset history" action={<CalendarDays size={17} />}>
+      <Panel title={t('Dataset history')} action={<CalendarDays size={17} />}>
         <div className="table-scroll">
           <table>
             <thead>
               <tr>
-                <th>Dataset</th>
-                <th>Snapshot date</th>
-                <th>Imported</th>
-                <th>Products</th>
-                <th>Files</th>
-                <th>Status</th>
-                <th>Action</th>
+                <th>{t('Dataset')}</th>
+                <th>{t('Snapshot date')}</th>
+                <th>{t('Imported')}</th>
+                <th>{t('Products')}</th>
+                <th>{t('Files')}</th>
+                <th>{t('Status')}</th>
+                <th>{t('Action')}</th>
               </tr>
             </thead>
             <tbody>
               {ws.datasets.map((d) => (
                 <tr key={d.id}>
                   <td>
-                    {d.id === 'demo-dataset' ? 'Demo inventory' : d.id.slice(0, 8)}
-                    {d.id === ws.datasetId && <span className="active-dataset">Active</span>}
+                    {d.id === 'demo-dataset' ? t('Demo inventory') : d.id.slice(0, 8)}
+                    {d.id === ws.datasetId && <span className="active-dataset">{t('Active')}</span>}
                   </td>
                   <td>{formatDate(d.as_of)}</td>
                   <td>{formatDate(d.created_at)}</td>
-                  <td>{d.summary.items?.toLocaleString() ?? '—'}</td>
+                  <td>{d.summary.items?.toLocaleString(getNumberLocale()) ?? '—'}</td>
                   <td>{d.summary.files ?? '—'}</td>
                   <td>
                     <Badge status={d.status} />
@@ -144,7 +148,7 @@ export function Reports() {
                         void ws.refresh(d.id, '').catch(() => {})
                       }}
                     >
-                      Use dataset
+                      {t('Use dataset')}
                     </Button>
                   </td>
                 </tr>
@@ -154,28 +158,36 @@ export function Reports() {
         </div>
         {!ws.datasets.length && (
           <EmptyState
-            title="No imported datasets"
-            description="Import your workbooks to create the first inventory snapshot."
+            title={t('No imported datasets')}
+            description={t('Import your workbooks to create the first inventory snapshot.')}
           />
         )}
       </Panel>
       <Panel
-        title="Recent activity"
-        action={<span className="muted text-small">Latest {ws.events.length} events</span>}
+        title={t('Recent activity')}
+        action={
+          <span className="muted text-small">
+            {t('Latest')} {ws.events.length} {t('events')}
+          </span>
+        }
       >
         <div className="report-filters">
           <SearchInput
             value={query}
             onChange={setQuery}
-            label="Search activity"
-            placeholder="Search action or entity..."
+            label={t('Search activity')}
+            placeholder={t('Search action or entity...')}
           />
-          <select value={eventType} onChange={(e) => setEventType(e.target.value)} aria-label="Activity type">
-            <option value="all">All activity</option>
-            <option value="order">Purchase orders</option>
-            <option value="plan">Forecasts</option>
-            <option value="dataset">Imports</option>
-            <option value="job">Processing jobs</option>
+          <select
+            value={eventType}
+            onChange={(e) => setEventType(e.target.value)}
+            aria-label={t('Activity type')}
+          >
+            <option value="all">{t('All activity')}</option>
+            <option value="order">{t('Purchase orders')}</option>
+            <option value="plan">{t('Forecasts')}</option>
+            <option value="dataset">{t('Imports')}</option>
+            <option value="job">{t('Processing jobs')}</option>
           </select>
         </div>
         <div className="audit-list">
@@ -185,11 +197,11 @@ export function Reports() {
                 <Activity size={16} />
               </span>
               <div>
-                <strong>{e.action.replaceAll('.', ' · ')}</strong>
+                <strong>{t(e.action)}</strong>
                 <small>{e.entity_id}</small>
               </div>
               <time>
-                {new Date(e.created_at).toLocaleString('en-GB', {
+                {formatDateTime(new Date(e.created_at), {
                   day: '2-digit',
                   month: 'short',
                   hour: '2-digit',
@@ -202,7 +214,7 @@ export function Reports() {
         {!events.length && (
           <div className="empty-inline">
             <Search size={20} />
-            <span>No activity matches this filter.</span>
+            <span>{t('No activity matches this filter.')}</span>
           </div>
         )}
       </Panel>

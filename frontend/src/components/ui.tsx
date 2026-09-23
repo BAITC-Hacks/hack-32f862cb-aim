@@ -1,3 +1,4 @@
+import { t, useLanguage } from '../i18n'
 import { useEffect, useRef } from 'react'
 import type { ButtonHTMLAttributes, ReactNode } from 'react'
 import { ArrowRight, Check, CircleAlert, LoaderCircle, Search, X } from 'lucide-react'
@@ -17,6 +18,7 @@ export function Button({
   icon?: LucideIcon
   loading?: boolean
 }) {
+  useLanguage()
   return (
     <button
       {...props}
@@ -33,6 +35,7 @@ export function IconButton({
   label,
   ...props
 }: ButtonHTMLAttributes<HTMLButtonElement> & { icon: LucideIcon; label: string }) {
+  useLanguage()
   return (
     <button {...props} className={`icon-button ${props.className ?? ''}`} aria-label={label} title={label}>
       <Icon size={19} />
@@ -40,18 +43,19 @@ export function IconButton({
   )
 }
 export function Badge({ status }: { status: Risk | string }) {
+  useLanguage()
   const labels: Record<string, string> = {
     ...riskLabels,
-    draft: 'Draft',
-    approved: 'Approved',
-    cancelled: 'Cancelled',
-    ready: 'Ready',
-    succeeded: 'Completed',
-    failed: 'Failed',
-    queued: 'Queued',
-    running: 'Processing',
+    draft: t('Draft'),
+    approved: t('Approved'),
+    cancelled: t('Cancelled'),
+    ready: t('Ready'),
+    succeeded: t('Completed'),
+    failed: t('Failed'),
+    queued: t('Queued'),
+    running: t('Processing'),
   }
-  return <span className={`badge badge-${status}`}>{labels[status] ?? status}</span>
+  return <span className={`badge badge-${status}`}>{labels[status] ?? t(status)}</span>
 }
 export function Panel({
   title,
@@ -64,6 +68,7 @@ export function Panel({
   children: ReactNode
   className?: string
 }) {
+  useLanguage()
   return (
     <section className={`panel ${className}`}>
       {title && (
@@ -77,6 +82,7 @@ export function Panel({
   )
 }
 export function TextLink({ children, onClick }: { children: ReactNode; onClick: () => void }) {
+  useLanguage()
   return (
     <button className="text-link" onClick={onClick}>
       {children}
@@ -95,6 +101,7 @@ export function PageHeader({
   description: string
   action?: ReactNode
 }) {
+  useLanguage()
   return (
     <div className="page-heading">
       <div>
@@ -109,14 +116,15 @@ export function PageHeader({
 export function SearchInput({
   value,
   onChange,
-  placeholder = 'Search products...',
-  label = 'Search products',
+  placeholder = t('Search products...'),
+  label = t('Search products'),
 }: {
   value: string
   onChange: (value: string) => void
   placeholder?: string
   label?: string
 }) {
+  useLanguage()
   return (
     <div className="search-input">
       <Search size={15} />
@@ -127,7 +135,7 @@ export function SearchInput({
         onChange={(e) => onChange(e.target.value)}
       />
       {value && (
-        <button aria-label="Clear search" onClick={() => onChange('')}>
+        <button aria-label={t('Clear search')} onClick={() => onChange('')}>
           <X size={13} />
         </button>
       )}
@@ -143,6 +151,7 @@ export function EmptyState({
   description: string
   action?: ReactNode
 }) {
+  useLanguage()
   return (
     <div className="empty-state">
       <Search size={27} />
@@ -152,7 +161,8 @@ export function EmptyState({
     </div>
   )
 }
-export function Loading({ text = 'Loading workspace...' }: { text?: string }) {
+export function Loading({ text = t('Loading workspace...') }: { text?: string }) {
+  useLanguage()
   return (
     <div className="loading-state" role="status">
       <LoaderCircle size={22} className="spin" />
@@ -161,11 +171,12 @@ export function Loading({ text = 'Loading workspace...' }: { text?: string }) {
   )
 }
 export function InlineError({ message, retry }: { message: string; retry?: () => void }) {
+  useLanguage()
   return (
     <div className="inline-error" role="alert">
       <CircleAlert size={18} />
-      <span>{message}</span>
-      {retry && <Button onClick={retry}>Retry</Button>}
+      <span>{t(message)}</span>
+      {retry && <Button onClick={retry}>{t('Retry')}</Button>}
     </div>
   )
 }
@@ -184,6 +195,7 @@ export function Dialog({
   drawer?: boolean
   wide?: boolean
 }) {
+  useLanguage()
   const ref = useRef<HTMLDialogElement>(null)
   useEffect(() => {
     const dialog = ref.current!
@@ -224,7 +236,7 @@ export function Dialog({
           <h2>{title}</h2>
           {description && <p>{description}</p>}
         </div>
-        <IconButton icon={X} label="Close dialog" onClick={onClose} />
+        <IconButton icon={X} label={t('Close dialog')} onClick={onClose} />
       </div>
       <div className="dialog-content">{children}</div>
     </dialog>
@@ -241,6 +253,7 @@ export function Toggle({
   checked: boolean
   onChange: (checked: boolean) => void
 }) {
+  useLanguage()
   return (
     <label className="toggle-row">
       <span>

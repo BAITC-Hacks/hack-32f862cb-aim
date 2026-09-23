@@ -1,3 +1,4 @@
+import { t, useLanguage } from '../i18n'
 import { useEffect, useMemo, useState } from 'react'
 import { Check, CheckCheck, Download, FilePenLine, Plus, ShoppingCart, X } from 'lucide-react'
 import { useSearchParams } from 'react-router-dom'
@@ -16,6 +17,7 @@ import {
 } from '../components/ui'
 
 function OrderDetails({ id, onClose }: { id: string; onClose: () => void }) {
+  useLanguage()
   const ws = useWorkspace()
   const [order, setOrder] = useState<Order | null>(null)
   const [error, setError] = useState('')
@@ -68,7 +70,7 @@ function OrderDetails({ id, onClose }: { id: string; onClose: () => void }) {
   return (
     <Dialog
       title={shortId(id)}
-      description="Review quantities and approve your next delivery."
+      description={t('Review quantities and approve your next delivery.')}
       onClose={() => {
         if (!ws.busy) onClose()
       }}
@@ -76,20 +78,20 @@ function OrderDetails({ id, onClose }: { id: string; onClose: () => void }) {
     >
       {error && <InlineError message={error} retry={() => setAttempt((a) => a + 1)} />}
       {!order ? (
-        <Loading text="Loading purchase order..." />
+        <Loading text={t('Loading purchase order...')} />
       ) : (
         <>
           <div className="order-details-summary">
             <div>
-              <span>Supplier</span>
+              <span>{t('Supplier')}</span>
               <strong>{supplierName(order.supplier)}</strong>
             </div>
             <div>
-              <span>Expected arrival</span>
+              <span>{t('Expected arrival')}</span>
               <strong>{formatDate(order.arrival_date)}</strong>
             </div>
             <div>
-              <span>Revision</span>
+              <span>{t('Revision')}</span>
               <strong>v{order.revision}</strong>
             </div>
             <Badge status={order.status} />
@@ -105,10 +107,10 @@ function OrderDetails({ id, onClose }: { id: string; onClose: () => void }) {
                 <thead>
                   <tr>
                     <th>SKU</th>
-                    <th>Product</th>
-                    <th>Recommended</th>
-                    <th>Order quantity</th>
-                    <th>Unit</th>
+                    <th>{t('Product')}</th>
+                    <th>{t('Recommended')}</th>
+                    <th>{t('Order quantity')}</th>
+                    <th>{t('Unit')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -126,7 +128,7 @@ function OrderDetails({ id, onClose }: { id: string; onClose: () => void }) {
                             max="1000000000"
                             step="0.0001"
                             required
-                            aria-label={`Quantity for ${line.code}`}
+                            aria-label={t`Quantity for ${line.code}`}
                             disabled={ws.busy}
                             value={edits[line.id] ?? line.quantity}
                             onChange={(e) => setEdits((v) => ({ ...v, [line.id]: e.target.value }))}
@@ -144,18 +146,20 @@ function OrderDetails({ id, onClose }: { id: string; onClose: () => void }) {
             {dirty.length > 0 && (
               <div className="order-edit-reason">
                 <label>
-                  Reason for changing quantities
+                  {t('Reason for changing quantities')}
                   <textarea
                     required
                     minLength={3}
                     maxLength={1000}
-                    placeholder="e.g. Adjusted for a confirmed customer project"
+                    placeholder={t('e.g. Adjusted for a confirmed customer project')}
                     value={reason}
                     onChange={(e) => setReason(e.target.value)}
                   />
                 </label>
                 <p>
-                  Quantities must respect each product’s minimum and order multiple. Use 0 to remove a line.
+                  {t(
+                    'Quantities must respect each product’s minimum and order multiple. Use 0 to remove a line.',
+                  )}
                 </p>
                 <Button
                   type="submit"
@@ -164,29 +168,29 @@ function OrderDetails({ id, onClose }: { id: string; onClose: () => void }) {
                   loading={ws.busy}
                   disabled={reason.trim().length < 3}
                 >
-                  Save {dirty.length} changes
+                  {t('Save changes ({0})', dirty.length)}
                 </Button>
               </div>
             )}
           </form>
           {cancelConfirm && (
             <div className="cancel-confirm">
-              <strong>Cancel this purchase order?</strong>
-              <p>Its quantities will no longer count as a supply commitment in future calculations.</p>
+              <strong>{t('Cancel this purchase order?')}</strong>
+              <p>{t('Its quantities will no longer count as a supply commitment in future calculations.')}</p>
               <div>
                 <Button variant="danger" onClick={() => void act('cancel')} loading={ws.busy}>
-                  Confirm cancellation
+                  {t('Confirm cancellation')}
                 </Button>
                 <Button onClick={() => setCancelConfirm(false)} disabled={ws.busy}>
-                  Keep order
+                  {t('Keep order')}
                 </Button>
               </div>
             </div>
           )}
           <div className="dialog-actions order-dialog-actions">
             <span>
-              {order.lines?.length ?? 0} order lines ·{' '}
-              {order.status === 'approved' ? 'Ready for export' : 'Review before approval'}
+              {order.lines?.length ?? 0} {t('order lines ·')}{' '}
+              {order.status === 'approved' ? t('Ready for export') : t('Review before approval')}
             </span>
             {order.status !== 'cancelled' && ws.canApprove && (
               <Button
@@ -195,7 +199,7 @@ function OrderDetails({ id, onClose }: { id: string; onClose: () => void }) {
                 disabled={ws.busy || dirty.length > 0}
                 onClick={() => setCancelConfirm(true)}
               >
-                Cancel order
+                {t('Cancel order')}
               </Button>
             )}
             {order.status === 'draft' && (
@@ -206,7 +210,7 @@ function OrderDetails({ id, onClose }: { id: string; onClose: () => void }) {
                 loading={ws.busy}
                 onClick={() => void act('approve')}
               >
-                Approve order
+                {t('Approve order')}
               </Button>
             )}
             {order.status === 'approved' && (
@@ -217,12 +221,12 @@ function OrderDetails({ id, onClose }: { id: string; onClose: () => void }) {
                   void ws.exportOrder(order).catch((e) => ws.notify(errorMessage(e), 'error'))
                 }}
               >
-                Export CSV
+                {t('Export CSV')}
               </Button>
             )}
           </div>
           {order.status === 'draft' && !ws.canApprove && (
-            <p className="small-note">An approver or administrator must approve this order.</p>
+            <p className="small-note">{t('An approver or administrator must approve this order.')}</p>
           )}
         </>
       )}
@@ -231,6 +235,7 @@ function OrderDetails({ id, onClose }: { id: string; onClose: () => void }) {
 }
 
 export function Orders() {
+  useLanguage()
   const ws = useWorkspace()
   const [params] = useSearchParams()
   const [query, setQuery] = useState('')
@@ -262,9 +267,9 @@ export function Orders() {
   return (
     <div className="page">
       <PageHeader
-        eyebrow="Workspace / Orders"
-        title="From insight to incoming."
-        description="Review recommendations, build supplier orders and keep every decision traceable."
+        eyebrow={t('Workspace / Orders')}
+        title={t('From insight to incoming.')}
+        description={t('Review recommendations, build supplier orders and keep every decision traceable.')}
         action={
           <Button
             variant="primary"
@@ -273,21 +278,21 @@ export function Orders() {
             loading={ws.busy}
             disabled={!ws.canPlan || !ws.planId}
           >
-            Create from forecast
+            {t('Create from forecast')}
           </Button>
         }
       />
       <div className="summary-strip">
         {[
-          { label: 'All purchase orders', count: ws.orders.length, icon: ShoppingCart, tone: '' },
+          { label: t('All purchase orders'), count: ws.orders.length, icon: ShoppingCart, tone: '' },
           {
-            label: 'Awaiting review',
+            label: t('Awaiting review'),
             count: ws.orders.filter((o) => o.status === 'draft').length,
             icon: FilePenLine,
             tone: 'warning',
           },
           {
-            label: 'Approved orders',
+            label: t('Approved orders'),
             count: ws.orders.filter((o) => o.status === 'approved').length,
             icon: CheckCheck,
             tone: 'success',
@@ -316,14 +321,14 @@ export function Orders() {
                   setPage(0)
                 }}
               >
-                {s === 'all' ? 'All orders' : s[0].toUpperCase() + s.slice(1)}
+                {s === 'all' ? t('All orders') : t(s[0].toUpperCase() + s.slice(1))}
               </button>
             ))}
           </div>
           <div className="table-actions">
             <SearchInput
-              label="Search orders"
-              placeholder="Search orders..."
+              label={t('Search orders')}
+              placeholder={t('Search orders...')}
               value={query}
               onChange={(v) => {
                 setQuery(v)
@@ -331,14 +336,14 @@ export function Orders() {
               }}
             />
             <select
-              aria-label="Filter orders by supplier"
+              aria-label={t('Filter orders by supplier')}
               value={supplier}
               onChange={(e) => {
                 setSupplier(e.target.value)
                 setPage(0)
               }}
             >
-              <option value="">All suppliers</option>
+              <option value="">{t('All suppliers')}</option>
               {[...new Set(ws.orders.map((o) => o.supplier))].map((s) => (
                 <option key={s} value={s}>
                   {supplierName(s)}
@@ -351,13 +356,13 @@ export function Orders() {
           <table>
             <thead>
               <tr>
-                <th>Order</th>
-                <th>Supplier</th>
-                <th>Created</th>
-                <th>Expected arrival</th>
-                <th>Revision</th>
-                <th>Status</th>
-                <th>Action</th>
+                <th>{t('Order')}</th>
+                <th>{t('Supplier')}</th>
+                <th>{t('Created')}</th>
+                <th>{t('Expected arrival')}</th>
+                <th>{t('Revision')}</th>
+                <th>{t('Status')}</th>
+                <th>{t('Action')}</th>
               </tr>
             </thead>
             <tbody>
@@ -377,7 +382,7 @@ export function Orders() {
                   </td>
                   <td>
                     <button className="text-link" onClick={() => setSelected(o.id)}>
-                      Review order →
+                      {t('Review order →')}
                     </button>
                   </td>
                 </tr>
@@ -387,32 +392,34 @@ export function Orders() {
         </div>
         {!filtered.length && (
           <EmptyState
-            title="No orders here yet"
+            title={t('No orders here yet')}
             description={
               ws.planId
-                ? 'Create supplier drafts from your latest forecast, then review and approve them.'
-                : 'Run a forecast first to generate purchase recommendations.'
+                ? t('Create supplier drafts from your latest forecast, then review and approve them.')
+                : t('Run a forecast first to generate purchase recommendations.')
             }
             action={
               ws.planId && (
                 <Button icon={Plus} onClick={() => void draft()} disabled={!ws.canPlan} loading={ws.busy}>
-                  Create from forecast
+                  {t('Create from forecast')}
                 </Button>
               )
             }
           />
         )}
         <div className="table-footer">
-          <span>{filtered.length} orders</span>
+          <span>
+            {filtered.length} {t('orders')}
+          </span>
           <div className="pagination">
             <Button disabled={currentPage === 0} onClick={() => setPage(currentPage - 1)}>
-              Previous
+              {t('Previous')}
             </Button>
             <span>
               {currentPage + 1} / {maxPage + 1}
             </span>
             <Button disabled={currentPage === maxPage} onClick={() => setPage(currentPage + 1)}>
-              Next
+              {t('Next')}
             </Button>
           </div>
         </div>

@@ -1,3 +1,4 @@
+import { t } from './i18n'
 import { StrictMode, Component } from 'react'
 import type { ReactNode } from 'react'
 import { createRoot } from 'react-dom/client'
@@ -7,6 +8,7 @@ import '@fontsource/inter/600.css'
 import '@fontsource/inter/700.css'
 import './styles.css'
 import './styles-responsive.css'
+import './styles-i18n.css'
 import App from './App'
 
 class ErrorBoundary extends Component<{ children: ReactNode }, { failed: boolean }> {
@@ -18,10 +20,10 @@ class ErrorBoundary extends Component<{ children: ReactNode }, { failed: boolean
     if (this.state.failed)
       return (
         <div className="fatal-error">
-          <h1>Let's get your workspace back.</h1>
-          <p>The interface encountered an unexpected error. Reload to try again.</p>
+          <h1>{t("Let's get your workspace back.")}</h1>
+          <p>{t('The interface encountered an unexpected error. Reload to try again.')}</p>
           <button className="button button-primary" onClick={() => location.reload()}>
-            Reload workspace
+            {t('Reload workspace')}
           </button>
           <button
             className="button"
@@ -32,7 +34,7 @@ class ErrorBoundary extends Component<{ children: ReactNode }, { failed: boolean
               location.reload()
             }}
           >
-            Restore demo workspace
+            {t('Restore demo workspace')}
           </button>
         </div>
       )
