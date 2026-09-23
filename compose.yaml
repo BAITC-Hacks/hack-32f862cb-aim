@@ -1,0 +1,78 @@
+name: optistock
+
+x-app: &app
+  build: .
+  image: optistock-api:local
+  init: true
+  environment: &app-env
+    OPTISTOCK_DATABASE_URL: postgresql+psycopg://optistock:${OPTISTOCK_DB_PASSWORD:?Run scripts/configure.py}@db:5432/optistock
+    OPTISTOCK_STORAGE_ROOT: /app/var/files
+    OPTISTOCK_SAMPLE_ROOT: /samples
+    OPTISTOCK_CORS_ORIGINS: '${OPTISTOCK_CORS_ORIGINS:-["http://localhost:5173"]}'
+    OPTISTOCK_LEASE_SECONDS: ${OPTISTOCK_LEASE_SECONDS:-60}
+    OPTISTOCK_JOB_TIMEOUT_SECONDS: ${OPTISTOCK_JOB_TIMEOUT_SECONDS:-900}
+    OPTISTOCK_MAX_ATTEMPTS: ${OPTISTOCK_MAX_ATTEMPTS:-3}
+  volumes:
+    - documents:/app/var/files
+  security_opt: [no-new-privileges:true]
+  cap_drop: [ALL]
+  read_only: true
+  tmpfs: [/tmp:size=128m]
+  mem_limit: 768m
+  cpus: 2
+  logging:
+    driver: json-file
+    options: {max-size: "10m", max-file: "3"}
+
+services:
+  db:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.db
+    image: optistock-postgres:local
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Run scripts/configure.py}
+      OPTISTOCK_DB_PASSWORD: ${OPTISTOCK_DB_PASSWORD:?Run scripts/configure.py}
+    ports: ["127.0.0.1:5435:5432"]
+    volumes:
+      - database:/var/lib/postgresql/data
+    healthcheck:
+      test: [CMD-SHELL, "pg_isready -U postgres -d postgres"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+    mem_limit: 512m
+  migrate:
+    <<: *app
+    command: [alembic, upgrade, head]
+    depends_on:
+      db: {condition: service_healthy}
+    restart: "no"
+  api:
+    <<: *app
+    ports: ["127.0.0.1:8000:8000"]
+    volumes:
+      - documents:/app/var/files
+      - ./IEK:/samples/IEK:ro
+      - ./Systeme electric:/samples/Systeme electric:ro
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+    healthcheck:
+      test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://localhost:8000/health/ready', timeout=3)"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+  worker:
+    <<: *app
+    command: [python, -m, optistock.worker]
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+    stop_grace_period: 15s
+    restart: unless-stopped
+    mem_limit: 1536m
+
+volumes:
+  database:
+  documents:

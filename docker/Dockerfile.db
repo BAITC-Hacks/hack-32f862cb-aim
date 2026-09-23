@@ -1,0 +1,2 @@
+FROM postgres:17.11-alpine
+COPY --chmod=0644 docker/init-db.sh /docker-entrypoint-initdb.d/01-init.sh
