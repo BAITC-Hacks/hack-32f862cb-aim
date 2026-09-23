@@ -12,7 +12,7 @@
 python3 scripts/configure.py
 docker compose up -d --build
 docker compose ps
-```
+```ффф
 
 `configure.py` создаёт случайные пароли, не перезаписывая существующий `.env`. Сервисы: PostgreSQL 17, миграции Alembic, FastAPI и отдельный worker. База и файлы сохраняются в volumes. API слушает только `127.0.0.1:8000`, PostgreSQL — `127.0.0.1:5435`.
 
