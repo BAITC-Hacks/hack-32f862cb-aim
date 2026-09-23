@@ -1,3 +1,4 @@
+import { t } from '../i18n'
 import type { AuditEvent, Dataset, Job, Order, Plan, Product, Recommendation, Snapshot } from '../types'
 
 export class ApiError extends Error {
@@ -32,7 +33,9 @@ export class Api {
         ?.map((d: { field: string; message: string }) => `${d.field}: ${d.message}`)
         .join('; ')
       throw new ApiError(
-        [error.message || `Request failed (${response.status})`, details].filter(Boolean).join(' — '),
+        [error.message ? t(error.message) : t`Request failed (${response.status})`, details]
+          .filter(Boolean)
+          .join(' — '),
         response.status,
       )
     }
@@ -140,7 +143,7 @@ export class Api {
       update(job)
       if (job.status === 'succeeded') return job
       if (job.status === 'failed')
-        throw new Error(job.error?.message ?? 'Processing failed. Retry the job below.')
+        throw new Error(job.error?.message ?? t('Processing failed. Retry the job below.'))
       await new Promise<void>((resolve, reject) => {
         const abort = () => {
           clearTimeout(timer)
@@ -154,7 +157,9 @@ export class Api {
       })
     }
     throw new Error(
-      'Processing is taking longer than expected. The job continues on the server; refresh to check its result.',
+      t(
+        'Processing is taking longer than expected. The job continues on the server; refresh to check its result.',
+      ),
     )
   }
 }

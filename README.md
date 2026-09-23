@@ -44,6 +44,8 @@ React 19, TypeScript strict, Vite, Recharts; Python/FastAPI, Pydantic, openpyxl;
 
 ## React-интерфейс
 
+Переключение **English / Русский / Қазақша** доступно в верхней панели и настройках. Выбор сохраняется в браузере; переведены все страницы, формы, статусы, графики и объяснения агента. Данные товаров и исходные документы сохраняют оригинальные названия. Подробнее: [frontend/README.md](frontend/README.md#язык-интерфейса).
+
 ```powershell
 cd frontend
 npm.cmd ci

@@ -1,3 +1,4 @@
+import { t, useLanguage } from '../i18n'
 import { useState } from 'react'
 import { Activity, ArrowRight, Box, Download, ShieldCheck, TriangleAlert } from 'lucide-react'
 import { useWorkspace } from '../store'
@@ -8,6 +9,7 @@ import { CategoryChart, InventoryDonut, StockBars } from '../components/charts'
 import { MetricCard } from '../components/MetricCard'
 
 export function Analytics() {
+  useLanguage()
   const ws = useWorkspace()
   const { showProduct } = useShell()
   const [supplier, setSupplier] = useState('')
@@ -19,30 +21,32 @@ export function Analytics() {
   function exportSummary() {
     downloadBlob(
       csvBlob([
-        ['Metric', 'Value', 'Supplier scope'],
-        ['Products', products.length, supplier || 'All'],
-        ['Healthy', healthy, supplier || 'All'],
-        ['Critical', critical, supplier || 'All'],
-        ['Data warnings', warnings.length, supplier || 'All'],
+        [t('Metric'), t('Value'), t('Supplier scope')],
+        [t('Products'), products.length, supplier || t('All')],
+        [t('Healthy'), healthy, supplier || t('All')],
+        [t('Critical'), critical, supplier || t('All')],
+        [t('Data warnings'), warnings.length, supplier || t('All')],
       ]),
       'optistock-analytics.csv',
     )
-    ws.notify('Analytics summary exported.')
+    ws.notify(t('Analytics summary exported.'))
   }
   return (
     <div className="page">
       <PageHeader
-        eyebrow="Intelligence / Analytics"
-        title="The bigger picture, made clear."
-        description="Understand inventory health, product coverage and the quality of your planning data."
+        eyebrow={t('Intelligence / Analytics')}
+        title={t('The bigger picture, made clear.')}
+        description={t(
+          'Understand inventory health, product coverage and the quality of your planning data.',
+        )}
         action={
           <>
             <select
-              aria-label="Analytics supplier"
+              aria-label={t('Analytics supplier')}
               value={supplier}
               onChange={(e) => setSupplier(e.target.value)}
             >
-              <option value="">All suppliers</option>
+              <option value="">{t('All suppliers')}</option>
               {[...new Set(ws.products.map((p) => p.supplier))].map((s) => (
                 <option value={s} key={s}>
                   {supplierName(s)}
@@ -50,70 +54,70 @@ export function Analytics() {
               ))}
             </select>
             <Button icon={Download} onClick={exportSummary}>
-              Export summary
+              {t('Export summary')}
             </Button>
           </>
         }
       />
       <div className="metrics-grid analytics-metrics">
         <MetricCard
-          label="Products in scope"
+          label={t('Products in scope')}
           value={products.length}
           icon={Box}
-          description="in the current dataset"
+          description={t('in the current dataset')}
         />
         <MetricCard
-          label="Inventory health"
+          label={t('Inventory health')}
           value={`${Math.round((healthy / (products.length || 1)) * 100)}%`}
           icon={ShieldCheck}
           tone="success"
-          description={`${formatNumber(healthy)} healthy products`}
+          description={t`${formatNumber(healthy)} healthy products`}
         />
         <MetricCard
-          label="Critical stock"
+          label={t('Critical stock')}
           value={critical}
           icon={TriangleAlert}
           tone="danger"
-          description="projected shortage before arrival"
+          description={t('projected shortage before arrival')}
         />
         <MetricCard
-          label="Data warnings"
+          label={t('Data warnings')}
           value={warnings.length}
           icon={Activity}
           tone="blue"
-          description="products with assumptions to review"
+          description={t('products with assumptions to review')}
         />
       </div>
       <div className="analytics-grid">
-        <Panel title="Inventory health distribution">
+        <Panel title={t('Inventory health distribution')}>
           <InventoryDonut products={products} />
         </Panel>
-        <Panel title="Products by category">
+        <Panel title={t('Products by category')}>
           <CategoryChart products={products} />
         </Panel>
-        <Panel title={ws.mode === 'demo' ? 'Warehouse coverage' : 'Supplier coverage'}>
+        <Panel title={ws.mode === 'demo' ? t('Warehouse coverage') : t('Supplier coverage')}>
           <StockBars products={products} group={ws.mode === 'demo' ? 'warehouse' : 'supplier'} />
         </Panel>
-        <Panel title="Planning readiness">
+        <Panel title={t('Planning readiness')}>
           <div className="readiness-list">
             {[
               {
-                label: 'Forecast available',
+                label: t('Forecast available'),
                 count: products.filter((p) => p.recommendationId && p.risk !== 'insufficient_data').length,
                 tone: 'green',
               },
               {
-                label: 'Current stock known',
+                label: t('Current stock known'),
                 count: products.filter((p) => p.available != null).length,
                 tone: 'blue',
               },
               {
-                label: 'Order constraints provided',
+                label: t('Order constraints provided'),
                 count: products.filter((p) => p.minimum != null && p.multiple != null).length,
                 tone: 'purple',
               },
               {
-                label: 'No data warnings',
+                label: t('No data warnings'),
                 count: products.filter((p) => !p.warnings.length).length,
                 tone: 'green',
               },
@@ -134,22 +138,27 @@ export function Analytics() {
         </Panel>
       </div>
       <Panel
-        title="Data quality & assumptions"
-        action={<span className="badge badge-reorder">{warnings.length} products</span>}
+        title={t('Data quality & assumptions')}
+        action={
+          <span className="badge badge-reorder">
+            {warnings.length} {t('products')}
+          </span>
+        }
       >
         <p className="panel-description">
-          Review the inputs that can affect purchase decisions. Missing data is never counted as healthy
-          stock.
+          {t(
+            'Review the inputs that can affect purchase decisions. Missing data is never counted as healthy stock.',
+          )}
         </p>
         <div className="table-scroll">
           <table>
             <thead>
               <tr>
                 <th>SKU</th>
-                <th>Product</th>
-                <th>Supplier</th>
-                <th>Warnings</th>
-                <th>Action</th>
+                <th>{t('Product')}</th>
+                <th>{t('Supplier')}</th>
+                <th>{t('Warnings')}</th>
+                <th>{t('Action')}</th>
               </tr>
             </thead>
             <tbody>
@@ -158,10 +167,10 @@ export function Analytics() {
                   <td>{p.code}</td>
                   <td>{p.name}</td>
                   <td>{supplierName(p.supplier)}</td>
-                  <td className="warning-cell">{p.warnings.join(', ').replaceAll('_', ' ')}</td>
+                  <td className="warning-cell">{p.warnings.map((warning) => t(warning)).join(', ')}</td>
                   <td>
                     <button className="text-link" onClick={() => showProduct(p)}>
-                      Review <ArrowRight size={14} />
+                      {t('Review')} <ArrowRight size={14} />
                     </button>
                   </td>
                 </tr>
@@ -171,17 +180,17 @@ export function Analytics() {
         </div>
         {!warnings.length && (
           <EmptyState
-            title="No data warnings in this selection"
-            description="Review individual recommendations to inspect their source data and calculation."
+            title={t('No data warnings in this selection')}
+            description={t('Review individual recommendations to inspect their source data and calculation.')}
           />
         )}
         {warnings.length > 6 && (
           <div className="table-footer">
             <span>
-              {showAll ? warnings.length : 6} of {warnings.length} products
+              {showAll ? warnings.length : 6} {t('of')} {warnings.length} {t('products')}
             </span>
             <Button onClick={() => setShowAll((v) => !v)}>
-              {showAll ? 'Show fewer' : 'Show all warnings'}
+              {showAll ? t('Show fewer') : t('Show all warnings')}
             </Button>
           </div>
         )}

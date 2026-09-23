@@ -1,3 +1,4 @@
+import { t, useLanguage } from '../i18n'
 import { useState } from 'react'
 import { ArrowRight, Box, Building2, ShoppingCart, TriangleAlert } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
@@ -6,6 +7,7 @@ import { formatNumber, supplierName } from '../lib/format'
 import { EmptyState, PageHeader, SearchInput } from '../components/ui'
 
 export function Suppliers() {
+  useLanguage()
   const ws = useWorkspace()
   const navigate = useNavigate()
   const [query, setQuery] = useState('')
@@ -15,13 +17,13 @@ export function Suppliers() {
   return (
     <div className="page">
       <PageHeader
-        eyebrow="Workspace / Suppliers"
-        title="Stronger supply connections."
-        description="Understand supplier coverage, stock exposure and purchase commitments."
+        eyebrow={t('Workspace / Suppliers')}
+        title={t('Stronger supply connections.')}
+        description={t('Understand supplier coverage, stock exposure and purchase commitments.')}
         action={
           <SearchInput
-            label="Search suppliers"
-            placeholder="Search suppliers..."
+            label={t('Search suppliers')}
+            placeholder={t('Search suppliers...')}
             value={query}
             onChange={setQuery}
           />
@@ -42,31 +44,31 @@ export function Suppliers() {
                   <h2>{supplierName(supplier)}</h2>
                   <p>
                     <Building2 size={12} />
-                    Electrical supplies
+                    {t('Electrical supplies')}
                   </p>
                 </div>
-                <span className="badge badge-covered">In catalog</span>
+                <span className="badge badge-covered">{t('In catalog')}</span>
               </div>
               <div className="supplier-stats">
                 <div>
                   <Box size={16} />
                   <strong>{formatNumber(products.length)}</strong>
-                  <span>Products</span>
+                  <span>{t('Products')}</span>
                 </div>
                 <div>
                   <TriangleAlert size={16} />
                   <strong>{critical}</strong>
-                  <span>Critical SKU</span>
+                  <span>{t('Critical SKU')}</span>
                 </div>
                 <div>
                   <ShoppingCart size={16} />
                   <strong>{orders.length}</strong>
-                  <span>Orders</span>
+                  <span>{t('Orders')}</span>
                 </div>
               </div>
               <div className="supplier-health">
                 <span>
-                  Inventory health <strong>{percent}%</strong>
+                  {t('Inventory health')} <strong>{percent}%</strong>
                 </span>
                 <div>
                   <i style={{ width: `${percent}%` }} />
@@ -74,11 +76,11 @@ export function Suppliers() {
               </div>
               <div className="supplier-card-footer">
                 <button onClick={() => navigate(`/inventory?supplier=${encodeURIComponent(supplier)}`)}>
-                  View inventory
+                  {t('View inventory')}
                   <ArrowRight size={14} />
                 </button>
                 <button onClick={() => navigate(`/orders?supplier=${encodeURIComponent(supplier)}`)}>
-                  View orders
+                  {t('View orders')}
                   <ArrowRight size={14} />
                 </button>
               </div>
@@ -88,8 +90,8 @@ export function Suppliers() {
       </div>
       {!suppliers.length && (
         <EmptyState
-          title="No suppliers found"
-          description="Import an inventory dataset or try a different search."
+          title={t('No suppliers found')}
+          description={t('Import an inventory dataset or try a different search.')}
         />
       )}
     </div>

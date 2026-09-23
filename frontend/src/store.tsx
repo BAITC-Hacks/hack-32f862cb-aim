@@ -1,3 +1,4 @@
+import { t, useLanguage } from './i18n'
 import { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 import { Api } from './lib/api'
@@ -110,16 +111,16 @@ function useWorkspaceState() {
   }
 
   async function connect(nextBase: string, nextToken: string) {
-    if (mutationLock.current) throw new Error('Wait for the current operation to finish.')
+    if (mutationLock.current) throw new Error(t('Wait for the current operation to finish.'))
     const normalized = nextBase.trim().replace(/\/$/, '')
     if (!normalized || (!normalized.startsWith('/') && !/^https?:\/\//.test(normalized)))
-      throw new Error('Use a relative API path or an http(s) URL.')
+      throw new Error(t('Use a relative API path or an http(s) URL.'))
     const client = new Api(normalized, nextToken.trim())
     const profile = await client.request<User>('/me')
     if (mode === 'live' && normalized === base && nextToken.trim() === token) {
       await refresh()
       setUser(profile)
-      notify(`Connected as ${profile.name}`)
+      notify(t`Connected as ${profile.name}`)
       return
     }
     controller.current?.abort()
@@ -135,12 +136,12 @@ function useWorkspaceState() {
     setError('')
     setJob(null)
     setMode('live')
-    notify(`Connected as ${profile.name}`)
+    notify(t`Connected as ${profile.name}`)
   }
 
   function useDemo() {
     if (mutationLock.current) {
-      notify('Wait for the current operation to finish.', 'info')
+      notify(t('Wait for the current operation to finish.'), 'info')
       return
     }
     controller.current?.abort()
@@ -157,7 +158,7 @@ function useWorkspaceState() {
   }
 
   async function perform<T>(operation: () => Promise<T>) {
-    if (mutationLock.current) throw new Error('Another operation is in progress.')
+    if (mutationLock.current) throw new Error(t('Another operation is in progress.'))
     mutationLock.current = true
     setBusy(true)
     try {
@@ -196,7 +197,7 @@ function useWorkspaceState() {
 
   async function importData(files?: File[], supplier = 'iek', asOf = '2026-09-22') {
     return perform(async () => {
-      if (mode === 'demo') throw new Error('Connect your API in Settings to import Excel files.')
+      if (mode === 'demo') throw new Error(t('Connect your API in Settings to import Excel files.'))
       let body: unknown = { as_of: asOf }
       if (files) {
         const form = new FormData()
@@ -211,13 +212,13 @@ function useWorkspaceState() {
       )
       await trackJob(result.job_id)
       await refresh(result.dataset_id, '')
-      notify('Dataset imported. Your inventory is ready.')
+      notify(t('Dataset imported. Your inventory is ready.'))
     })
   }
 
   async function runPlan(scenario: Scenario) {
     return perform(async () => {
-      if (!data.datasetId) throw new Error('Import or select a ready dataset first.')
+      if (!data.datasetId) throw new Error(t('Import or select a ready dataset first.'))
       if (mode === 'demo') {
         const planId = `demo-plan-${Date.now()}`
         setData((d) => {
@@ -281,7 +282,7 @@ function useWorkspaceState() {
             planId,
           )
         })
-        notify('Demo scenario updated. Recommendations recalculated.')
+        notify(t('Demo scenario updated. Recommendations recalculated.'))
         return
       }
       const result = await api.mutate<{ plan_id: string; job_id: string }>('/plans', {
@@ -290,17 +291,17 @@ function useWorkspaceState() {
       })
       await trackJob(result.job_id)
       await refresh(data.datasetId, result.plan_id)
-      notify('Analysis complete. Recommendations are ready.')
+      notify(t('Analysis complete. Recommendations are ready.'))
     })
   }
 
   async function draftOrders() {
     return perform(async () => {
-      if (!data.planId) throw new Error('Run a forecast before creating orders.')
+      if (!data.planId) throw new Error(t('Run a forecast before creating orders.'))
       if (mode === 'demo') {
         const existing = data.orders.filter((o) => o.plan_id === data.planId)
         if (existing.length) {
-          notify('Drafts for this plan already exist.', 'info')
+          notify(t('Drafts for this plan already exist.'), 'info')
           return
         }
         const suppliers = [
@@ -334,8 +335,8 @@ function useWorkspaceState() {
         )
         notify(
           orders.length
-            ? `${orders.length} supplier orders created.`
-            : 'No replenishment needed for this plan.',
+            ? t`${orders.length} supplier orders created.`
+            : t('No replenishment needed for this plan.'),
           orders.length ? 'success' : 'info',
         )
         return
@@ -344,8 +345,8 @@ function useWorkspaceState() {
       await refresh()
       notify(
         result.order_ids.length
-          ? `${result.order_ids.length} supplier orders ready for review.`
-          : 'No replenishment needed.',
+          ? t`${result.order_ids.length} supplier orders ready for review.`
+          : t('No replenishment needed.'),
         result.order_ids.length ? 'success' : 'info',
       )
     })
@@ -354,7 +355,7 @@ function useWorkspaceState() {
   async function getOrder(id: string): Promise<Order> {
     if (mode === 'demo') {
       const order = data.orders.find((o) => o.id === id)
-      if (!order) throw new Error('Order not found')
+      if (!order) throw new Error(t('Order not found'))
       return order
     }
     return api.request<Order>(`/orders/${id}`)
@@ -362,7 +363,7 @@ function useWorkspaceState() {
 
   async function startAgent(scenario: Scenario, datasetId: string): Promise<AgentRun> {
     return perform(async () => {
-      if (mode !== 'live') throw new Error('Подключите API для запуска агента на исходных данных.')
+      if (mode !== 'live') throw new Error(t('Подключите API для запуска агента на исходных данных.'))
       const result = await api.mutate<{ run_id: string }>('/agent/runs', { dataset_id: datasetId, scenario })
       return api.request<AgentRun>(`/agent/runs/${result.run_id}`)
     })
@@ -372,7 +373,7 @@ function useWorkspaceState() {
     return perform(async () => {
       if (mode === 'demo') {
         if (action === 'approve' && !order.lines?.some((l) => Number(l.quantity) > 0))
-          throw new Error('An empty order cannot be approved.')
+          throw new Error(t('An empty order cannot be approved.'))
         setData((d) =>
           addDemoEvent(
             {
@@ -395,7 +396,7 @@ function useWorkspaceState() {
         await api.mutate(`/orders/${order.id}/${action}`, { revision: order.revision })
         await refresh()
       }
-      notify(action === 'approve' ? 'Order approved. Ready to export.' : 'Order cancelled.')
+      notify(action === 'approve' ? t('Order approved. Ready to export.') : t('Order cancelled.'))
     })
   }
 
@@ -407,7 +408,9 @@ function useWorkspaceState() {
             (c) => Number(c.quantity) !== 0 && (Number(c.quantity) < 10 || Number(c.quantity) % 10 !== 0),
           )
         )
-          throw new Error('Demo orders require a minimum of 10 and multiples of 10, or 0 to remove a line.')
+          throw new Error(
+            t('Demo orders require a minimum of 10 and multiples of 10, or 0 to remove a line.'),
+          )
         const byId = new Map(changes.map((c) => [c.line_id, c]))
         setData((d) =>
           addDemoEvent(
@@ -435,17 +438,26 @@ function useWorkspaceState() {
         await api.mutate(`/orders/${order.id}`, { revision: order.revision, lines: changes }, 'PATCH')
         await refresh()
       }
-      notify('Order changes saved.')
+      notify(t('Order changes saved.'))
     })
   }
 
   async function exportOrder(order: Order) {
-    if (order.status !== 'approved') throw new Error('Approve this order before exporting.')
+    if (order.status !== 'approved') throw new Error(t('Approve this order before exporting.'))
     const blob =
       mode === 'live'
         ? await api.request<Blob>(`/orders/${order.id}/export`)
         : csvBlob([
-            ['Order', 'Revision', 'Supplier', 'SKU', 'Product', 'Unit', 'Quantity', 'Arrival'],
+            [
+              t('Order'),
+              t('Revision'),
+              t('Supplier'),
+              'SKU',
+              t('Product'),
+              t('Unit'),
+              t('Quantity'),
+              t('Arrival'),
+            ],
             ...(order.lines ?? [])
               .filter((l) => Number(l.quantity) > 0)
               .map((l) => [
@@ -475,7 +487,7 @@ function useWorkspaceState() {
       await api.mutate(`/jobs/${job.id}/retry`)
       await trackJob(job.id)
       await refresh('', '')
-      notify('Processing completed.')
+      notify(t('Processing completed.'))
     })
   }
 
@@ -511,7 +523,7 @@ function useWorkspaceState() {
     retryJob,
     resetDemo: () => {
       setData(createDemoSnapshot())
-      notify('Demo workspace restored.')
+      notify(t('Demo workspace restored.'))
     },
   }
 }
@@ -525,6 +537,7 @@ function createDemoSnapshotProductForecast(product: Product) {
 type Workspace = ReturnType<typeof useWorkspaceState>
 const WorkspaceContext = createContext<Workspace | null>(null)
 export function WorkspaceProvider({ children }: { children: ReactNode }) {
+  useLanguage()
   const workspace = useWorkspaceState()
   return <WorkspaceContext.Provider value={workspace}>{children}</WorkspaceContext.Provider>
 }

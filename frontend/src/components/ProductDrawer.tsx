@@ -1,14 +1,17 @@
+import { t, useLanguage } from '../i18n'
 import { useEffect, useState } from 'react'
 import { ArrowRight, Box, CircleAlert, FileText, PackageCheck, ShieldCheck } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useWorkspace } from '../store'
 import { errorMessage, formatNumber, supplierName } from '../lib/format'
+import { explanationSummary, inventorySource } from '../i18n/domain'
 import type { Explanation, Product } from '../types'
 import { Badge, Button, Dialog, InlineError, Loading } from './ui'
 import { DemandChart } from './charts'
 import { DemandHistory } from './DemandHistory'
 
 export function ProductDrawer({ product, onClose }: { product: Product; onClose: () => void }) {
+  useLanguage()
   const ws = useWorkspace()
   const navigate = useNavigate()
   const [explanation, setExplanation] = useState<Explanation | null>(null)
@@ -38,8 +41,8 @@ export function ProductDrawer({ product, onClose }: { product: Product; onClose:
   }, [product, ws.api, attempt])
   return (
     <Dialog
-      title="Product details"
-      description="Understand the risk. Make the next move."
+      title={t('Product details')}
+      description={t('Understand the risk. Make the next move.')}
       drawer
       onClose={onClose}
     >
@@ -51,30 +54,30 @@ export function ProductDrawer({ product, onClose }: { product: Product; onClose:
           <span className="eyebrow">{product.code}</span>
           <h2>{product.name}</h2>
           <span className="muted">
-            {supplierName(product.supplier)} · {product.warehouse || 'Supplier aggregate'}
+            {supplierName(product.supplier)} · {product.warehouse || t('Supplier aggregate')}
           </span>
         </div>
       </div>
       <div className="detail-status">
         <Badge status={product.risk} />
-        <span>{product.category || 'Uncategorised'}</span>
+        <span>{product.category || t('Uncategorised')}</span>
       </div>
       <div className="detail-metrics">
         <div>
-          <span>Current stock</span>
+          <span>{t('Current stock')}</span>
           <strong>
             {formatNumber(product.available)} <small>{product.unit}</small>
           </strong>
         </div>
         <div>
-          <span>Recommended order</span>
+          <span>{t('Recommended order')}</span>
           <strong className="text-accent">
             {formatNumber(product.recommended)} <small>{product.unit}</small>
           </strong>
         </div>
       </div>
       {loading ? (
-        <Loading text="Loading recommendation..." />
+        <Loading text={t('Loading recommendation...')} />
       ) : error ? (
         <InlineError
           message={error}
@@ -88,25 +91,25 @@ export function ProductDrawer({ product, onClose }: { product: Product; onClose:
           <div className="detail-section">
             <h3>
               <PackageCheck size={16} />
-              Recommendation breakdown
+              {t('Recommendation breakdown')}
             </h3>
             <dl className="breakdown">
               {[
-                ['Forecast demand', formatNumber(explanation.forecast_quantity)],
-                ['Safety stock', formatNumber(explanation.safety_stock)],
-                ['Available inventory', formatNumber(explanation.inventory)],
+                [t('Forecast demand'), formatNumber(explanation.forecast_quantity)],
+                [t('Safety stock'), formatNumber(explanation.safety_stock)],
+                [t('Available inventory'), formatNumber(explanation.inventory)],
                 [
-                  'Incoming during forecast',
+                  t('Incoming during forecast'),
                   formatNumber(explanation.daily_projection.reduce((total, day) => total + day.incoming, 0)),
                 ],
-                ['Annual trend', `${((explanation.annual_trend_ratio - 1) * 100).toFixed(1)}%`],
-                ['Unrounded requirement', formatNumber(explanation.raw_order_quantity)],
+                [t('Annual trend'), `${formatNumber((explanation.annual_trend_ratio - 1) * 100)}%`],
+                [t('Unrounded requirement'), formatNumber(explanation.raw_order_quantity)],
                 [
-                  'Minimum / order multiple',
+                  t('Minimum / order multiple'),
                   `${explanation.rounding.minimum} / ${explanation.rounding.multiple}`,
                 ],
-                ['Purchase unit conversion', explanation.rounding.conversion],
-                ['Expected shortage before delivery', formatNumber(explanation.pre_arrival_lost_sales)],
+                [t('Purchase unit conversion'), explanation.rounding.conversion],
+                [t('Expected shortage before delivery'), formatNumber(explanation.pre_arrival_lost_sales)],
               ].map(([label, value]) => (
                 <div key={label}>
                   <dt>{label}</dt>
@@ -114,16 +117,16 @@ export function ProductDrawer({ product, onClose }: { product: Product; onClose:
                 </div>
               ))}
               <div className="breakdown-total">
-                <dt>Final recommendation</dt>
+                <dt>{t('Final recommendation')}</dt>
                 <dd>
                   {formatNumber(explanation.order_quantity)} {product.unit}
                 </dd>
               </div>
             </dl>
-            <p className="detail-note">{explanation.text}</p>
+            <p className="detail-note">{explanationSummary(explanation, product.unit, ws.mode === 'demo')}</p>
           </div>
           <div className="detail-section">
-            <h3>Demand & forecast</h3>
+            <h3>{t('Demand & forecast')}</h3>
             <DemandChart explanation={explanation} demo={ws.mode === 'demo'} months={6} />
           </div>
           <DemandHistory key={product.recommendationId} explanation={explanation} unit={product.unit} />
@@ -131,10 +134,10 @@ export function ProductDrawer({ product, onClose }: { product: Product; onClose:
             <div className="warning-box">
               <CircleAlert size={17} />
               <div>
-                <strong>Review these assumptions</strong>
+                <strong>{t('Review these assumptions')}</strong>
                 <ul>
                   {explanation.warnings.map((w) => (
-                    <li key={w}>{w.replaceAll('_', ' ')}</li>
+                    <li key={w}>{t(w)}</li>
                   ))}
                 </ul>
               </div>
@@ -143,22 +146,24 @@ export function ProductDrawer({ product, onClose }: { product: Product; onClose:
           <details className="source-details">
             <summary>
               <FileText size={15} />
-              Data sources & inventory basis
+              {t('Data sources & inventory basis')}
             </summary>
-            <p>{explanation.inventory_source.replaceAll('_', ' ')}</p>
+            <p>{inventorySource(explanation.inventory_source)}</p>
             <pre>{JSON.stringify(explanation.sources, null, 2)}</pre>
           </details>
         </>
       ) : (
         <div className="warning-box">
           <CircleAlert size={18} />
-          <span>No recommendation yet. Run an analysis for this dataset to calculate procurement needs.</span>
+          <span>
+            {t('No recommendation yet. Run an analysis for this dataset to calculate procurement needs.')}
+          </span>
         </div>
       )}
       <div className="drawer-footer">
         <div className="small-note">
           <ShieldCheck size={15} />
-          Orders are reviewed before approval.
+          {t('Orders are reviewed before approval.')}
         </div>
         <Button
           variant="primary"
@@ -168,7 +173,7 @@ export function ProductDrawer({ product, onClose }: { product: Product; onClose:
             navigate(explanation ? '/orders' : '/forecast')
           }}
         >
-          {explanation ? 'Review purchase orders' : 'Open forecast'}
+          {explanation ? t('Review purchase orders') : t('Open forecast')}
         </Button>
       </div>
     </Dialog>

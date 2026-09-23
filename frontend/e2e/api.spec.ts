@@ -219,7 +219,7 @@ test('live API mapping, unknown stock, forecast, order revisions and export', as
   await modal
     .getByRole('textbox', { name: 'Reason for changing quantities' })
     .fill('Confirmed customer demand')
-  await modal.getByRole('button', { name: 'Save 1 changes' }).click()
+  await modal.getByRole('button', { name: 'Save changes (1)' }).click()
   await expect(modal.getByText('v2', { exact: true })).toBeVisible()
   await modal.getByRole('button', { name: 'Approve order', exact: true }).click()
   await expect(modal.getByText('Approved', { exact: true })).toBeVisible()
@@ -227,6 +227,26 @@ test('live API mapping, unknown stock, forecast, order revisions and export', as
   await modal.getByRole('button', { name: 'Export CSV' }).click()
   expect((await download).suggestedFilename()).toContain('r3.csv')
   expect(mutations.map((m) => m.key).length).toBe(new Set(mutations.map((m) => m.key)).size)
+})
+
+test('connected data, warnings and server errors respect the selected language', async ({ page }) => {
+  const { mutations } = await mockApi(page)
+  await page.getByRole('combobox', { name: 'Interface language' }).selectOption('kk')
+  await page.getByRole('link', { name: 'Тауарлар мен қалдықтар', exact: true }).click()
+  await page.getByRole('button', { name: 'REAL-001', exact: true }).click()
+  await expect(page.getByRole('dialog', { name: 'Тауар карточкасы' })).toBeVisible()
+  await expect(page.getByRole('dialog').getByText('Ағымдағы қалдық бағаланған; растау қажет')).toBeVisible()
+  await expect(page.getByRole('dialog').getByText('PROJECT-123', { exact: true })).toBeVisible()
+  await expect(page.getByRole('row', { name: '2026-08 100 31 -69' })).toBeVisible()
+  await page.getByRole('button', { name: 'Диалогті жабу' }).click()
+  expect(mutations).toHaveLength(0)
+  await page.route('**/api/v1/me', (route) =>
+    route.fulfill({ status: 401, json: { message: 'Недействительный API-ключ' } }),
+  )
+  await page.goto('/settings')
+  await page.getByLabel('API қол жеткізу кілті', { exact: false }).fill('invalid-key')
+  await page.getByRole('button', { name: 'Қосылымды жаңарту', exact: true }).click()
+  await expect(page.getByRole('alert')).toContainText('API кілті жарамсыз')
 })
 
 test('viewer permissions restrict mutations', async ({ page }) => {

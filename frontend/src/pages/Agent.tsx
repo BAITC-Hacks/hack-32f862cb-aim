@@ -1,3 +1,4 @@
+import { formatDateTime, t, useLanguage } from '../i18n'
 import { useEffect, useState } from 'react'
 import {
   ArrowRight,
@@ -20,6 +21,7 @@ import { useShell } from '../components/Layout'
 import { Badge, Button, InlineError, Panel, Toggle } from '../components/ui'
 import { defaultScenario } from '../lib/demo'
 import { downloadBlob, errorMessage, formatDate, formatNumber, supplierName } from '../lib/format'
+import { agentStepDetail } from '../i18n/domain'
 import type { AgentRun, Scenario } from '../types'
 
 const steps = [
@@ -31,6 +33,7 @@ const steps = [
 ]
 
 export function Agent() {
+  useLanguage()
   const ws = useWorkspace()
   const { openImport, showProduct } = useShell()
   const [scenario, setScenario] = useState<Scenario>({ ...defaultScenario })
@@ -119,19 +122,20 @@ export function Agent() {
       <section className="agent-hero">
         <div>
           <div className="eyebrow">
-            <Sparkles size={13} /> OPTISTOCK / PROCUREMENT AGENT
+            <Sparkles size={13} /> {t('OPTISTOCK / PROCUREMENT AGENT')}
           </div>
           <h1>
-            От Excel до заказа.
+            {t('От Excel до заказа.')}
             <br />
-            <span>Один запуск агента.</span>
+            <span>{t('Один запуск агента.')}</span>
           </h1>
           <p>
-            Агент выделит регулярный спрос, учтёт запас и товары в пути, подготовит объяснимые заказы каждому
-            поставщику.
+            {t(
+              'Агент выделит регулярный спрос, учтёт запас и товары в пути, подготовит объяснимые заказы каждому поставщику.',
+            )}
           </p>
           <div className="agent-trust">
-            <ShieldCheck size={16} /> Вы проверяете и утверждаете. Агент считает и готовит.
+            <ShieldCheck size={16} /> {t('Вы проверяете и утверждаете. Агент считает и готовит.')}
           </div>
         </div>
         <div className={`agent-orbit ${active ? 'is-active' : ''}`} aria-hidden="true">
@@ -154,19 +158,19 @@ export function Agent() {
         <Panel className="agent-connect">
           <Database size={24} />
           <div>
-            <h2>Подключите исходные данные</h2>
-            <p>Агент работает с серверным расчётом и Excel. Сейчас открыт демонстрационный каталог.</p>
+            <h2>{t('Подключите исходные данные')}</h2>
+            <p>{t('Агент работает с серверным расчётом и Excel. Сейчас открыт демонстрационный каталог.')}</p>
           </div>
           {ws.localWorkspace ? (
             <Button
               variant="primary"
               onClick={() => void ws.connect('/api/v1', 'local').catch((e) => setError(errorMessage(e)))}
             >
-              Подключить локальный сервер
+              {t('Подключить локальный сервер')}
             </Button>
           ) : (
             <Link className="button button-primary" to="/settings">
-              Настроить подключение <ArrowRight size={14} />
+              {t('Настроить подключение')} <ArrowRight size={14} />
             </Link>
           )}
         </Panel>
@@ -174,13 +178,13 @@ export function Agent() {
       {error && <InlineError message={error} />}
       <div className="agent-layout">
         <div className="agent-main">
-          <Panel title="Задача агенту" action={<span className="agent-label">Электрокомплект</span>}>
+          <Panel title={t('Задача агенту')} action={<span className="agent-label">Электрокомплект</span>}>
             <p className="agent-intro">
-              Рассчитать пополнение и подготовить черновики заказов по поставщикам.
+              {t('Рассчитать пополнение и подготовить черновики заказов по поставщикам.')}
             </p>
             <div className="agent-form-grid">
               <label className="field">
-                Набор данных
+                {t('Набор данных')}
                 <select
                   value={currentDataset}
                   disabled={ws.mode !== 'live' || active}
@@ -192,7 +196,7 @@ export function Agent() {
                   }}
                 >
                   <option value="" disabled>
-                    Сначала импортируйте Excel
+                    {t('Сначала импортируйте Excel')}
                   </option>
                   {readyDatasets.map((d) => (
                     <option key={d.id} value={d.id}>
@@ -202,28 +206,28 @@ export function Agent() {
                 </select>
               </label>
               <label className="field">
-                Поставщик
+                {t('Поставщик')}
                 <select
                   value={scenario.supplier || ''}
                   disabled={active}
                   onChange={(e) => update('supplier', e.target.value || null)}
                 >
-                  <option value="">Все поставщики</option>
+                  <option value="">{t('Все поставщики')}</option>
                   <option value="iek">IEK</option>
                   <option value="systeme">Systeme Electric</option>
                 </select>
               </label>
               <label className="field">
-                Категория
+                {t('Категория')}
                 <input
                   value={scenario.category ?? ''}
                   disabled={active}
                   onChange={(e) => update('category', e.target.value || null)}
-                  placeholder="Все категории (или код из файла)"
+                  placeholder={t('Все категории (или код из файла)')}
                 />
               </label>
               <label className="field">
-                Срок поставки, дней
+                {t('Срок поставки, дней')}
                 <input
                   type="number"
                   min={1}
@@ -234,7 +238,7 @@ export function Agent() {
                 />
               </label>
               <label className="field">
-                Цикл заказа, дней
+                {t('Цикл заказа, дней')}
                 <input
                   type="number"
                   min={1}
@@ -245,7 +249,7 @@ export function Agent() {
                 />
               </label>
               <label className="field">
-                Страховой запас, дней
+                {t('Страховой запас, дней')}
                 <input
                   type="number"
                   min={0}
@@ -256,7 +260,7 @@ export function Agent() {
                 />
               </label>
               <label className="field">
-                Плановый рост, %
+                {t('Плановый рост, %')}
                 <input
                   type="number"
                   min={-50}
@@ -269,28 +273,29 @@ export function Agent() {
               <div className="agent-scope">
                 <Database size={17} />
                 <span>
-                  Общий запас поставщика<small>Складской разрез отсутствует в файлах кейса</small>
+                  {t('Общий запас поставщика')}
+                  <small>{t('Складской разрез отсутствует в файлах кейса')}</small>
                 </span>
               </div>
             </div>
             <div className="agent-toggles">
               <Toggle
-                label="Убирать разовые всплески"
+                label={t('Убирать разовые всплески')}
                 checked={scenario.remove_outliers}
                 onChange={(value) => !active && update('remove_outliers', value)}
               />
               <Toggle
-                label="Оценивать потерянный спрос"
+                label={t('Оценивать потерянный спрос')}
                 checked={scenario.estimate_stockouts}
                 onChange={(value) => !active && update('estimate_stockouts', value)}
               />
               <Toggle
-                label="Учитывать сезонность"
+                label={t('Учитывать сезонность')}
                 checked={scenario.use_seasonality}
                 onChange={(value) => !active && update('use_seasonality', value)}
               />
               <Toggle
-                label="Учитывать устойчивый тренд"
+                label={t('Учитывать устойчивый тренд')}
                 checked={scenario.use_trend}
                 onChange={(value) => !active && update('use_trend', value)}
               />
@@ -303,17 +308,17 @@ export function Agent() {
                 disabled={ws.mode !== 'live' || !ws.canPlan || !currentDataset || ws.loading}
                 onClick={() => void start()}
               >
-                {active ? 'Агент выполняет задачу' : 'Запустить агента'}
+                {active ? t('Агент выполняет задачу') : t('Запустить агента')}
               </Button>
               <Button icon={FileSpreadsheet} disabled={ws.busy || active || !ws.canPlan} onClick={openImport}>
-                Импорт Excel
+                {t('Импорт Excel')}
               </Button>
               {ws.mode === 'live' && !readyDatasets.length && (
                 <Button
                   disabled={ws.busy || !ws.canPlan}
                   onClick={() => void ws.importData().catch(() => {})}
                 >
-                  Загрузить материалы кейса
+                  {t('Загрузить материалы кейса')}
                 </Button>
               )}
             </div>
@@ -323,10 +328,10 @@ export function Agent() {
             <>
               <div className="agent-metrics">
                 {[
-                  ['Товаров проверено', report.summary.items, Database],
-                  ['Позиций к заказу', report.summary.order_lines, Truck],
-                  ['Разовых всплесков', report.summary.excluded_documents, Sparkles],
-                  ['Требуют внимания', report.summary.exception_items, CircleAlert],
+                  [t('Товаров проверено'), report.summary.items, Database],
+                  [t('Позиций к заказу'), report.summary.order_lines, Truck],
+                  [t('Разовых всплесков'), report.summary.excluded_documents, Sparkles],
+                  [t('Требуют внимания'), report.summary.exception_items, CircleAlert],
                 ].map(([label, value, Icon]) => {
                   const MetricIcon = Icon as typeof Database
                   return (
@@ -339,7 +344,7 @@ export function Agent() {
                 })}
               </div>
               <Panel
-                title="Результат работы агента"
+                title={t('Результат работы агента')}
                 action={
                   <Button
                     variant="ghost"
@@ -351,16 +356,16 @@ export function Agent() {
                       )
                     }
                   >
-                    Отчёт
+                    {t('Отчёт')}
                   </Button>
                 }
               >
-                <div className="agent-tabs" role="tablist" aria-label="Результаты агента">
+                <div className="agent-tabs" role="tablist" aria-label={t('Результаты агента')}>
                   {(
                     [
-                      ['orders', 'Заказы'],
-                      ['exceptions', 'Требуют внимания'],
-                      ['cleaning', 'Разовые всплески'],
+                      ['orders', t('Заказы')],
+                      ['exceptions', t('Требуют внимания')],
+                      ['cleaning', t('Разовые всплески')],
                     ] as const
                   ).map(([key, title]) => (
                     <button key={key} role="tab" aria-selected={tab === key} onClick={() => setTab(key)}>
@@ -382,7 +387,11 @@ export function Agent() {
                           <div>
                             <h3>{supplierName(supplier.supplier)}</h3>
                             <p>
-                              {supplier.order_lines} позиций · {supplier.critical} с риском дефицита
+                              {t(
+                                'Lines: {0} · at risk of shortage: {1}',
+                                formatNumber(supplier.order_lines),
+                                formatNumber(supplier.critical),
+                              )}
                             </p>
                             <small>
                               {Object.entries(supplier.quantities)
@@ -392,10 +401,10 @@ export function Agent() {
                           </div>
                           {order ? (
                             <Link className="button button-secondary" to={`/orders?order=${order.id}`}>
-                              Проверить заказ <ArrowRight size={14} />
+                              {t('Проверить заказ')} <ArrowRight size={14} />
                             </Link>
                           ) : (
-                            <span className="muted">Пополнение не требуется</span>
+                            <span className="muted">{t('Пополнение не требуется')}</span>
                           )}
                         </div>
                       )
@@ -403,8 +412,9 @@ export function Agent() {
                     <div className="agent-note">
                       <ShieldCheck size={17} />
                       <span>
-                        Черновики сохранены в базе. Проверьте остатки и допущения, при необходимости измените
-                        количества. Экспорт доступен после утверждения.
+                        {t(
+                          'Черновики сохранены в базе. Проверьте остатки и допущения, при необходимости измените количества. Экспорт доступен после утверждения.',
+                        )}
                       </span>
                     </div>
                   </div>
@@ -412,8 +422,11 @@ export function Agent() {
                 {tab === 'exceptions' && (
                   <div className="agent-results">
                     <p className="muted">
-                      Показаны первые {report.exceptions?.length} из {report.exceptions_total} позиций. Полный
-                      список — в каталоге.
+                      {t(
+                        'Showing {0} of {1} items. The full list is in the catalog.',
+                        formatNumber(report.exceptions?.length),
+                        formatNumber(report.exceptions_total),
+                      )}
                     </p>
                     {report.exceptions?.map((item) => (
                       <button
@@ -427,20 +440,21 @@ export function Agent() {
                             {item.code} <span>{supplierName(item.supplier)}</span>
                           </strong>
                           <p>{item.name}</p>
-                          <small>{item.reasons.join(' · ')}</small>
+                          <small>{item.reasons.map((reason) => t(reason)).join(' · ')}</small>
                         </div>
                         <Badge status={item.risk} />
                         <ArrowRight size={16} />
                       </button>
                     ))}
-                    {!report.exceptions?.length && <p>Позиции с указанными рисками не обнаружены.</p>}
+                    {!report.exceptions?.length && <p>{t('Позиции с указанными рисками не обнаружены.')}</p>}
                   </div>
                 )}
                 {tab === 'cleaning' && (
                   <div className="agent-results">
                     <p className="muted">
-                      Сравнение заказа при одинаковом сценарии: без очистки документов → с очисткой. Разные
-                      единицы измерения не суммируются.
+                      {t(
+                        'Сравнение заказа при одинаковом сценарии: без очистки документов → с очисткой. Разные единицы измерения не суммируются.',
+                      )}
                     </p>
                     {report.outlier_comparisons?.map((item) => (
                       <button
@@ -452,7 +466,7 @@ export function Agent() {
                         <div>
                           <strong>{item.code}</strong>
                           <small>
-                            {supplierName(item.supplier)} · {item.documents} документов
+                            {supplierName(item.supplier)} · {item.documents} {t('документов')}
                           </small>
                         </div>
                         <span>
@@ -467,22 +481,23 @@ export function Agent() {
                       <div className="agent-note">
                         <Check size={20} />
                         <span>
-                          Подтверждённых разовых всплесков для очистки не найдено. Агент сохраняет продажи,
-                          если документов недостаточно или месячные итоги не сходятся.
+                          {t(
+                            'Подтверждённых разовых всплесков для очистки не найдено. Агент сохраняет продажи, если документов недостаточно или месячные итоги не сходятся.',
+                          )}
                         </span>
                       </div>
                     )}
                   </div>
                 )}
               </Panel>
-              <Panel title="Качество и границы данных">
+              <Panel title={t('Качество и границы данных')}>
                 <div className="agent-coverage">
                   {report.quality &&
                     [
-                      ['История продаж', report.quality.with_history],
-                      ['Текущий остаток из файла', report.quality.with_current_inventory],
-                      ['Детализация продаж', report.quality.with_transactions],
-                      ['Товары с поставками в пути', report.quality.with_incoming],
+                      [t('История продаж'), report.quality.with_history],
+                      [t('Текущий остаток из файла'), report.quality.with_current_inventory],
+                      [t('Детализация продаж'), report.quality.with_transactions],
+                      [t('Товары с поставками в пути'), report.quality.with_incoming],
                     ].map(([label, value]) => (
                       <div key={label}>
                         <span>{label}</span>
@@ -495,7 +510,7 @@ export function Agent() {
                 </div>
                 <ul className="agent-limitations">
                   {report.limitations?.map((text) => (
-                    <li key={text}>{text}</li>
+                    <li key={text}>{t(text)}</li>
                   ))}
                 </ul>
               </Panel>
@@ -504,9 +519,13 @@ export function Agent() {
         </div>
         <aside className="agent-side">
           <Panel
-            title="Ход выполнения"
+            title={t('Ход выполнения')}
             action={
-              run ? <Badge status={run.status} /> : <span className="agent-label">Готов к запуску</span>
+              run ? (
+                <Badge status={run.status} />
+              ) : (
+                <span className="agent-label">{t('Готов к запуску')}</span>
+              )
             }
           >
             <ol className="agent-steps" aria-live="polite">
@@ -525,8 +544,8 @@ export function Agent() {
                       )}
                     </span>
                     <div>
-                      <strong>{step.title}</strong>
-                      <p>{step.detail}</p>
+                      <strong>{t(step.title)}</strong>
+                      <p>{agentStepDetail(step, report)}</p>
                       {running && run.job.progress.total && (
                         <small>
                           {run.job.progress.processed ?? 0} / {run.job.progress.total} SKU
@@ -539,9 +558,9 @@ export function Agent() {
             </ol>
             {run?.status === 'failed' && (
               <div className="agent-failed">
-                <InlineError message={run.job.error?.message || 'Не удалось завершить расчёт'} />
+                <InlineError message={run.job.error?.message || t('Не удалось завершить расчёт')} />
                 <Button disabled={!ws.canPlan} onClick={() => void retry()}>
-                  Повторить задачу
+                  {t('Повторить задачу')}
                 </Button>
               </div>
             )}
@@ -549,37 +568,37 @@ export function Agent() {
               <Clock3 size={16} />
               <span>
                 {active
-                  ? 'Можно закрыть вкладку: агент продолжит работу на сервере.'
+                  ? t('Можно закрыть вкладку: агент продолжит работу на сервере.')
                   : complete
-                    ? 'Расчёт завершён. Следующий шаг — проверка менеджером.'
-                    : 'Результат и объяснения сохраняются после каждого запуска.'}
+                    ? t('Расчёт завершён. Следующий шаг — проверка менеджером.')
+                    : t('Результат и объяснения сохраняются после каждого запуска.')}
               </span>
             </div>
           </Panel>
           {run && (
-            <Panel title="Параметры этого запуска">
+            <Panel title={t('Параметры этого запуска')}>
               <dl className="agent-run-config">
                 <div>
-                  <dt>Дата данных</dt>
+                  <dt>{t('Дата данных')}</dt>
                   <dd>{report?.quality?.as_of || ws.datasets.find((d) => d.id === run.dataset_id)?.as_of}</dd>
                 </div>
                 <div>
-                  <dt>Поставка / цикл / буфер</dt>
+                  <dt>{t('Поставка / цикл / буфер')}</dt>
                   <dd>
                     {run.scenario.lead_time_days} / {run.scenario.review_days} / {run.scenario.safety_days}{' '}
-                    дн.
+                    {t('дн.')}
                   </dd>
                 </div>
                 <div>
-                  <dt>Рост / очистка</dt>
+                  <dt>{t('Рост / очистка')}</dt>
                   <dd>
-                    {run.scenario.growth_percent}% / {run.scenario.remove_outliers ? 'вкл.' : 'выкл.'}
+                    {run.scenario.growth_percent}% / {run.scenario.remove_outliers ? t('вкл.') : t('выкл.')}
                   </dd>
                 </div>
               </dl>
             </Panel>
           )}
-          <Panel title="История запусков">
+          <Panel title={t('История запусков')}>
             <div className="agent-history">
               {runs.length ? (
                 runs.map((item) => (
@@ -592,7 +611,7 @@ export function Agent() {
                       <strong>#{item.id.slice(0, 8)}</strong>
                       <small>
                         {formatDate(item.created_at)} ·{' '}
-                        {new Date(item.created_at).toLocaleTimeString('ru', {
+                        {formatDateTime(new Date(item.created_at), {
                           hour: '2-digit',
                           minute: '2-digit',
                         })}
@@ -602,15 +621,16 @@ export function Agent() {
                   </button>
                 ))
               ) : (
-                <p className="muted">Здесь появятся сохранённые запуски агента.</p>
+                <p className="muted">{t('Здесь появятся сохранённые запуски агента.')}</p>
               )}
             </div>
           </Panel>
           <div className="agent-engine">
             <Bot size={16} />
             <p>
-              Агент выполняет проверяемые расчётные инструменты. Числа и решения доступны в отчёте каждого
-              запуска.
+              {t(
+                'Агент выполняет проверяемые расчётные инструменты. Числа и решения доступны в отчёте каждого запуска.',
+              )}
             </p>
           </div>
         </aside>

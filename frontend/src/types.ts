@@ -150,6 +150,7 @@ export interface AgentRun {
       order_lines: number
       critical_items: number
       excluded_documents: number
+      outlier_corrections?: number
       outlier_items: number
       stockout_items: number
       exception_items: number

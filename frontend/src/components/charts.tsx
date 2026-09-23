@@ -1,3 +1,4 @@
+import { formatDateTime, t, useLanguage } from '../i18n'
 import { useId } from 'react'
 import {
   Area,
@@ -17,6 +18,7 @@ import type { Explanation, Product } from '../types'
 
 const colors = ['#55cc93', '#6876ee', '#a087d8', '#d79351', '#489eaf']
 export function InventoryDonut({ products, compact = false }: { products: Product[]; compact?: boolean }) {
+  useLanguage()
   const counts = ['covered', 'reorder', 'critical', 'insufficient_data'].map(
     (r) => products.filter((p) => p.risk === r).length,
   )
@@ -26,7 +28,7 @@ export function InventoryDonut({ products, compact = false }: { products: Produc
   return (
     <div className={`inventory-overview ${compact ? 'compact' : ''}`}>
       <div className="donut">
-        <svg viewBox="0 0 180 180" role="img" aria-label={`${percentage}% healthy inventory`}>
+        <svg viewBox="0 0 180 180" role="img" aria-label={t`${percentage}% healthy inventory`}>
           <circle cx="90" cy="90" r="72" fill="none" stroke="#292c31" strokeWidth="15" />
           {counts.map((n, i) => {
             const start = offset
@@ -50,11 +52,11 @@ export function InventoryDonut({ products, compact = false }: { products: Produc
         </svg>
         <div className="donut-label">
           <strong>{percentage}%</strong>
-          <span>Healthy</span>
+          <span>{t('Healthy')}</span>
         </div>
       </div>
       <div className="donut-legend">
-        {['Healthy', 'At Risk', 'Critical', 'No forecast'].map(
+        {[t('Healthy'), t('At Risk'), t('Critical'), t('No forecast')].map(
           (label, i) =>
             (counts[i] > 0 || i < 3) && (
               <div key={label}>
@@ -80,13 +82,14 @@ export function DemandChart({
   months?: number
   large?: boolean
 }) {
+  useLanguage()
   const id = useId().replaceAll(':', '')
   let chart: { month: string; actual?: number; raw?: number | null; forecast?: number }[] = []
   const hasRawSales = !demo && !!explanation?.raw_monthly_sales?.length
   if (explanation) {
     const raw = new Map(explanation.raw_monthly_sales?.map((p) => [p.month, p.quantity]))
     chart = explanation.cleaned_monthly_sales.slice(-months).map((p, i) => ({
-      month: new Date(p.month).toLocaleDateString('en-US', {
+      month: formatDateTime(new Date(p.month), {
         month: 'short',
         year: large ? '2-digit' : undefined,
       }),
@@ -102,7 +105,7 @@ export function DemandChart({
       })
       chart.push(
         ...Array.from(forecast, ([month, quantity]) => ({
-          month: new Date(`${month}-01`).toLocaleDateString('en-US', {
+          month: formatDateTime(new Date(`${month}-01`), {
             month: 'short',
             year: large ? '2-digit' : undefined,
           }),
@@ -112,7 +115,7 @@ export function DemandChart({
     }
   }
   if (!chart.length || !explanation?.cleaned_monthly_sales.length)
-    return <div className="chart-empty">No observed sales history for a demand forecast.</div>
+    return <div className="chart-empty">{t('No observed sales history for a demand forecast.')}</div>
   return (
     <div className={`demand-chart ${large ? 'chart-large' : ''}`}>
       <div className="chart-canvas">
@@ -146,7 +149,7 @@ export function DemandChart({
             <Area
               type="monotone"
               dataKey="actual"
-              name={demo ? 'Actual sales' : 'Regular demand'}
+              name={demo ? t('Actual sales') : t('Regular demand')}
               fill={`url(#${id})`}
               stroke="#7d83f5"
               strokeWidth={2}
@@ -157,7 +160,7 @@ export function DemandChart({
               <Line
                 type="monotone"
                 dataKey="raw"
-                name="Source sales"
+                name={t('Source sales')}
                 stroke="#dba76d"
                 strokeWidth={1.5}
                 dot={false}
@@ -167,7 +170,7 @@ export function DemandChart({
             <Line
               type="monotone"
               dataKey="forecast"
-              name="Forecast"
+              name={t('Forecast')}
               stroke="#b6c4ec"
               strokeDasharray="6 6"
               strokeWidth={1.5}
@@ -180,19 +183,19 @@ export function DemandChart({
       <div className="chart-legend">
         <span>
           <i />
-          {demo ? 'Actual sales' : 'Regular demand'}
+          {demo ? t('Actual sales') : t('Regular demand')}
         </span>
         {hasRawSales && (
           <span>
             <i style={{ background: '#dba76d' }} />
-            Source sales
+            {t('Source sales')}
           </span>
         )}
         <span>
           <i className="dashed" />
-          Forecast
+          {t('Forecast')}
         </span>
-        {demo && <span className="muted">Illustrative data</span>}
+        {demo && <span className="muted">{t('Illustrative data')}</span>}
       </div>
     </div>
   )
@@ -205,15 +208,16 @@ export function StockBars({
   products: Product[]
   group?: 'warehouse' | 'supplier'
 }) {
+  useLanguage()
   const groups = new Map<string, number>()
   products.forEach((p) => {
-    const name = (group === 'warehouse' ? p.warehouse : p.supplier) || 'Consolidated'
+    const name = (group === 'warehouse' ? p.warehouse : p.supplier) || t('Consolidated')
     groups.set(name, (groups.get(name) ?? 0) + 1)
   })
   const rows = Array.from(groups, ([name, value]) => ({ name, value })).slice(0, 8)
   const maximum = Math.max(...rows.map((r) => r.value), 1)
   return (
-    <div className="stock-bars" role="img" aria-label={`SKU distribution by ${group}`}>
+    <div className="stock-bars" role="img" aria-label={t`SKU distribution by ${t(group)}`}>
       <div className="bar-grid" />
       {rows.map((r, i) => (
         <div className="stock-bar-column" key={r.name}>
@@ -235,9 +239,10 @@ export function StockBars({
 }
 
 export function CategoryChart({ products }: { products: Product[] }) {
+  useLanguage()
   const map = new Map<string, number>()
   products.forEach((p) =>
-    map.set(p.category || 'Uncategorised', (map.get(p.category || 'Uncategorised') ?? 0) + 1),
+    map.set(p.category || t('Uncategorised'), (map.get(p.category || t('Uncategorised')) ?? 0) + 1),
   )
   const rows = Array.from(map, ([name, count]) => ({ name, count }))
     .sort((a, b) => b.count - a.count)
@@ -260,7 +265,13 @@ export function CategoryChart({ products }: { products: Product[] }) {
             cursor={{ fill: '#ffffff05' }}
             contentStyle={{ background: '#202327', border: '1px solid #393d46', borderRadius: 8 }}
           />
-          <Bar dataKey="count" name="Products" radius={[0, 4, 4, 0]} barSize={19} isAnimationActive={false}>
+          <Bar
+            dataKey="count"
+            name={t('Products')}
+            radius={[0, 4, 4, 0]}
+            barSize={19}
+            isAnimationActive={false}
+          >
             {rows.map((r, i) => (
               <Cell key={r.name} fill={colors[i % colors.length]} />
             ))}
