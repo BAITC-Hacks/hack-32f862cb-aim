@@ -120,3 +120,67 @@ export interface Snapshot {
   datasetId: string
   planId: string
 }
+
+export interface AgentRun {
+  id: string
+  plan_id: string
+  dataset_id: string
+  created_at: string
+  finished_at: string | null
+  status: Job['status']
+  job: Job
+  scenario: Scenario
+  report: Partial<{
+    engine: string
+    decision: string
+    quality: {
+      items: number
+      with_history: number
+      without_history: number
+      with_current_inventory: number
+      with_incoming: number
+      with_transactions: number
+      with_category: number
+      as_of: string
+    }
+    summary: {
+      items: number
+      order_lines: number
+      critical_items: number
+      excluded_documents: number
+      outlier_items: number
+      stockout_items: number
+      exception_items: number
+    }
+    steps: { key: string; title: string; detail: string }[]
+    suppliers: {
+      supplier: string
+      items: number
+      order_lines: number
+      critical: number
+      quantities: Record<string, number>
+    }[]
+    exceptions: {
+      item_id: string
+      recommendation_id: string
+      code: string
+      name: string
+      supplier: string
+      risk: Risk
+      reasons: string[]
+    }[]
+    exceptions_total: number
+    outlier_comparisons: {
+      item_id: string
+      code: string
+      supplier: string
+      unit: string
+      without_cleaning: string
+      with_cleaning: string
+      documents: number
+    }[]
+    warnings: { code: string; items: number }[]
+    order_ids: string[]
+    limitations: string[]
+  }>
+}

@@ -12,6 +12,7 @@ const Forecast = lazy(() => import('./pages/Forecast').then((m) => ({ default: m
 const Analytics = lazy(() => import('./pages/Analytics').then((m) => ({ default: m.Analytics })))
 const Reports = lazy(() => import('./pages/Reports').then((m) => ({ default: m.Reports })))
 const Settings = lazy(() => import('./pages/Settings').then((m) => ({ default: m.Settings })))
+const Agent = lazy(() => import('./pages/Agent').then((m) => ({ default: m.Agent })))
 
 export default function App() {
   return (
@@ -27,6 +28,7 @@ export default function App() {
             <Route path="analytics" element={<Analytics />} />
             <Route path="reports" element={<Reports />} />
             <Route path="settings" element={<Settings />} />
+            <Route path="agent" element={<Agent />} />
             <Route
               path="*"
               element={

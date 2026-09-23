@@ -108,6 +108,14 @@ class Recommendation(Entity, Base):
     )
 
 
+class AgentRun(Entity, Base):
+    __tablename__ = "agent_runs"
+    plan_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("plans.id"), unique=True)
+    created_by: Mapped[uuid.UUID] = mapped_column(ForeignKey("credentials.id"))
+    report: Mapped[dict] = mapped_column(JSONB, default=dict)
+    finished_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+
 class Job(Entity, Base):
     __tablename__ = "jobs"
     kind: Mapped[str] = mapped_column(String(20))

@@ -35,6 +35,7 @@ const ImportDialog = lazy(() => import('./ImportDialog').then((m) => ({ default:
 
 const navigation = [
   { to: '/', label: 'Dashboard', icon: LayoutDashboard },
+  { to: '/agent', label: 'Procurement agent', icon: Sparkles },
   { to: '/inventory', label: 'Inventory', icon: Box },
   { to: '/suppliers', label: 'Suppliers', icon: Users },
   { to: '/orders', label: 'Orders', icon: ShoppingCart },

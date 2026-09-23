@@ -2,6 +2,7 @@
 
 import argparse
 import logging
+import os
 import signal
 import subprocess
 import sys
@@ -126,7 +127,8 @@ def main():
                     str(identifier),
                     "--token",
                     str(token),
-                ]
+                ],
+                creationflags=subprocess.CREATE_NO_WINDOW if os.name == "nt" else 0,
             )
             started = time.monotonic()
             try:

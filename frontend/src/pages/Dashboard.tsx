@@ -271,7 +271,7 @@ export function Dashboard() {
             <br />
             for a bigger tomorrow.
           </h2>
-          <button onClick={() => navigate('/forecast')}>
+          <button onClick={() => navigate('/agent')}>
             Run AI Analysis <ArrowRight size={16} />
           </button>
         </section>

@@ -3,7 +3,15 @@ import type { ReactNode } from 'react'
 import { Api } from './lib/api'
 import { createDemoSnapshot, defaultScenario, demoExplanation } from './lib/demo'
 import { csvBlob, downloadBlob, errorMessage } from './lib/format'
-import type { Explanation, Job, Order, OrderLine, Product, Scenario, Snapshot, User } from './types'
+import type { AgentRun, Explanation, Job, Order, OrderLine, Product, Scenario, Snapshot, User } from './types'
+
+const localWorkspace = import.meta.env.DEV && import.meta.env.VITE_LOCAL_WORKSPACE === '1'
+function initialToken() {
+  return (
+    sessionStorage.getItem('optistock.token') ||
+    (localWorkspace && localStorage.getItem('optistock.mode') !== 'demo' ? 'local' : '')
+  )
+}
 
 const emptySnapshot: Snapshot = {
   products: [],
@@ -30,12 +38,10 @@ export interface Notice {
 
 function useWorkspaceState() {
   const [mode, setMode] = useState<'demo' | 'live'>(() =>
-    sessionStorage.getItem('optistock.token') && localStorage.getItem('optistock.mode') === 'live'
-      ? 'live'
-      : 'demo',
+    initialToken() && localStorage.getItem('optistock.mode') !== 'demo' ? 'live' : 'demo',
   )
   const [base, setBase] = useState(() => localStorage.getItem('optistock.apiBase') || '/api/v1')
-  const [token, setToken] = useState(() => sessionStorage.getItem('optistock.token') || '')
+  const [token, setToken] = useState(initialToken)
   const [user, setUser] = useState<User>({ id: 'demo-user', name: 'Aigerim K.', role: 'admin' })
   const [data, setData] = useState<Snapshot>(() => (mode === 'demo' ? readDemo() : emptySnapshot))
   const [loading, setLoading] = useState(mode === 'live')
@@ -354,6 +360,14 @@ function useWorkspaceState() {
     return api.request<Order>(`/orders/${id}`)
   }
 
+  async function startAgent(scenario: Scenario, datasetId: string): Promise<AgentRun> {
+    return perform(async () => {
+      if (mode !== 'live') throw new Error('Подключите API для запуска агента на исходных данных.')
+      const result = await api.mutate<{ run_id: string }>('/agent/runs', { dataset_id: datasetId, scenario })
+      return api.request<AgentRun>(`/agent/runs/${result.run_id}`)
+    })
+  }
+
   async function changeOrder(order: Order, action: 'approve' | 'cancel') {
     return perform(async () => {
       if (mode === 'demo') {
@@ -487,6 +501,8 @@ function useWorkspaceState() {
     importData,
     runPlan,
     draftOrders,
+    startAgent,
+    localWorkspace,
     getOrder,
     changeOrder,
     editOrder,

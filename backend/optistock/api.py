@@ -23,6 +23,7 @@ from optistock.errors import DomainError
 from optistock.ingestion import store_file
 from optistock.middleware import BodyLimitMiddleware
 from optistock.models import (
+    AgentRun,
     AuditEvent,
     Credential,
     Dataset,
@@ -40,6 +41,7 @@ from optistock.services import (
     audit,
     draft_orders,
     edit_order,
+    enqueue_agent,
     enqueue_import,
     enqueue_plan,
     mutate,
@@ -333,6 +335,41 @@ def plans(db: DB, actor: Reader, limit: int = Query(50, ge=1, le=200), offset: i
             for p in db.scalars(select(Plan).order_by(Plan.created_at.desc()).offset(offset).limit(limit))
         ]
     }
+
+
+@app.post("/api/v1/agent/runs", status_code=202, tags=["Procurement agent"])
+def start_agent(payload: CreatePlan, key: Key, db: DB, actor: Planner):
+    return mutate(
+        db, actor, "agent", key, payload.model_dump(mode="json"), lambda: enqueue_agent(db, actor, payload)
+    )
+
+
+def agent_view(db, run):
+    plan = require(db, Plan, run.plan_id)
+    job = db.scalar(select(Job).where(Job.resource_id == plan.id, Job.kind == "plan"))
+    return {
+        **view(run),
+        "dataset_id": plan.dataset_id,
+        "status": job.status,
+        "scenario": plan.parameters,
+        "job": view(job, exclude=("token",)),
+    }
+
+
+@app.get("/api/v1/agent/runs", tags=["Procurement agent"])
+def agent_runs(
+    db: DB, actor: Reader, dataset_id: uuid.UUID | None = None, limit: int = Query(20, ge=1, le=100)
+):
+    query = select(AgentRun).join(Plan, AgentRun.plan_id == Plan.id)
+    if dataset_id:
+        query = query.where(Plan.dataset_id == dataset_id)
+    runs = db.scalars(query.order_by(AgentRun.created_at.desc()).limit(limit)).all()
+    return {"items": [agent_view(db, run) for run in runs]}
+
+
+@app.get("/api/v1/agent/runs/{identifier}", tags=["Procurement agent"])
+def get_agent_run(identifier: uuid.UUID, db: DB, actor: Reader):
+    return agent_view(db, require(db, AgentRun, identifier))
 
 
 @app.get("/api/v1/plans/{identifier}", tags=["Planning"])

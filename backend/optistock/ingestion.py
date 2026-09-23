@@ -79,9 +79,10 @@ def store_file(stream) -> str:
     root.mkdir(parents=True, exist_ok=True)
     digest = hashlib.sha256()
     size = 0
-    with tempfile.NamedTemporaryFile(dir=root, delete=False) as target:
-        temporary = Path(target.name)
-        try:
+    target = tempfile.NamedTemporaryFile(dir=root, delete=False)
+    temporary = Path(target.name)
+    try:
+        with target:
             while chunk := stream.read(1024 * 1024):
                 size += len(chunk)
                 if size > settings().upload_max_bytes:
@@ -90,12 +91,14 @@ def store_file(stream) -> str:
                 target.write(chunk)
             target.flush()
             os.fsync(target.fileno())
-            validate_xlsx(temporary)
-            key = digest.hexdigest()
+        # Windows cannot rename or unlink an open file. Close it before validation/publication.
+        validate_xlsx(temporary)
+        key = digest.hexdigest()
+        if not (root / f"{key}.xlsx").exists():
             temporary.replace(root / f"{key}.xlsx")
-            return key
-        finally:
-            temporary.unlink(missing_ok=True)
+        return key
+    finally:
+        temporary.unlink(missing_ok=True)
 
 
 @dataclass

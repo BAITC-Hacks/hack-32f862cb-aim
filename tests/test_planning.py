@@ -106,6 +106,14 @@ def test_missing_history_is_not_reported_as_covered():
     assert quantity == 0 and risk == "insufficient_data"
 
 
+def test_entirely_blank_sales_are_not_evidence_of_zero_demand():
+    quantity, risk, _, explanation = calculate(
+        product(sales={"2026-07-01": None, "2026-08-01": None}), date(2026, 9, 22), Scenario()
+    )
+    assert quantity == 0 and risk == "insufficient_data"
+    assert "no_monthly_sales_history" in explanation["warnings"]
+
+
 def test_sparse_demand_is_not_trimmed_to_zero_or_filled_as_stockout():
     sales = {f"2025-{m:02d}-01": 0 for m in range(1, 13)}
     sales["2025-12-01"] = 12

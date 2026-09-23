@@ -12,7 +12,9 @@ from optistock.db import session
 from optistock.errors import DomainError, LeaseLost
 from optistock.ingestion import parse_sources, store_file
 from optistock.models import (
+    AgentRun,
     AuditEvent,
+    Credential,
     Dataset,
     Idempotency,
     Item,
@@ -126,6 +128,32 @@ def enqueue_plan(db, actor, payload):
     return {"plan_id": str(plan.id), "job_id": str(job.id)}
 
 
+def enqueue_agent(db, actor, payload):
+    # Serialise identical active work across tabs and retries with different HTTP keys.
+    fingerprint = digest(payload.model_dump(mode="json"))
+    lock(db, f"agent:{actor.id}:{fingerprint}")
+    active = db.execute(
+        select(AgentRun, Plan, Job)
+        .join(Plan, AgentRun.plan_id == Plan.id)
+        .join(Job, (Job.resource_id == Plan.id) & (Job.kind == "plan"))
+        .where(
+            AgentRun.created_by == actor.id,
+            Plan.dataset_id == payload.dataset_id,
+            Plan.parameters == payload.scenario.model_dump(mode="json"),
+            Job.status.in_(["queued", "running"]),
+        )
+    ).first()
+    if active:
+        run, plan, job = active
+        return {"run_id": str(run.id), "plan_id": str(plan.id), "job_id": str(job.id), "reused": True}
+    result = enqueue_plan(db, actor, payload)
+    run = AgentRun(plan_id=uuid.UUID(result["plan_id"]), created_by=actor.id)
+    db.add(run)
+    db.flush()
+    audit(db, actor, "agent.start", run.id, result)
+    return {**result, "run_id": str(run.id), "reused": False}
+
+
 def check_lease(db, identifier, token):
     job = require(db, Job, identifier, locked=True)
     if job.status != "running" or job.token != token or job.lease_until <= utcnow():
@@ -205,9 +233,12 @@ def execute_job(identifier, token):
 
 
 def compute_plan(identifier, token, plan_id):
+    from optistock.agent import inspect_data, review_plan
+
     # Same lock order as approval. A consistent snapshot of approved commitments and revisions.
     with session() as db, db.begin():
         plan = require(db, Plan, plan_id)
+        agent_run = db.scalar(select(AgentRun).where(AgentRun.plan_id == plan_id))
         dataset = require(db, Dataset, plan.dataset_id)
         scenario = Scenario.model_validate(plan.parameters)
         states = db.scalars(
@@ -235,6 +266,10 @@ def compute_plan(identifier, token, plan_id):
         as_of = dataset.as_of
     if not items:
         raise DomainError("empty_selection", "В выбранном наборе/категории нет товаров")
+    quality = None
+    if agent_run:
+        progress_job(identifier, token, stage="validating", total=len(items))
+        quality = inspect_data(items, as_of)
     results = []
     for i, item in enumerate(items):
         q, risk, arrival, explanation = calculate(
@@ -242,6 +277,7 @@ def compute_plan(identifier, token, plan_id):
         )
         results.append(
             Recommendation(
+                id=uuid.uuid4(),
                 plan_id=plan_id,
                 item_id=item.id,
                 quantity=q,
@@ -252,6 +288,10 @@ def compute_plan(identifier, token, plan_id):
         )
         if i % 200 == 0:
             progress_job(identifier, token, stage="calculating", processed=i, total=len(items))
+    report = None
+    if agent_run:
+        progress_job(identifier, token, stage="reviewing", processed=len(items), total=len(items))
+        report = review_plan(items, results, as_of, scenario, commitments, quality)
     with session() as db, db.begin():
         job = check_lease(db, identifier, token)
         db.add_all(results)
@@ -264,6 +304,16 @@ def compute_plan(identifier, token, plan_id):
             "unforecastable_items": sum(r.risk == "insufficient_data" for r in results),
             "test_data": True,
         }
+        if agent_run:
+            actor = require(db, Credential, agent_run.created_by)
+            if not actor.active or actor.role not in {"admin", "planner"}:
+                raise DomainError("agent_permission_revoked", "Права запускающего пользователя изменены", 403)
+            db.flush()
+            orders = draft_orders(db, actor, plan_id)
+            current_run = require(db, AgentRun, agent_run.id)
+            current_run.report = {**report, **orders}
+            current_run.finished_at = utcnow()
+            audit(db, actor, "agent.complete", current_run.id, {"plan_id": str(plan_id), **orders})
         job.status, job.finished_at, job.progress = (
             "succeeded",
             utcnow(),

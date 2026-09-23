@@ -236,7 +236,7 @@ export function Orders() {
   const [query, setQuery] = useState('')
   const [status, setStatus] = useState('all')
   const [supplier, setSupplier] = useState(params.get('supplier') || '')
-  const [selected, setSelected] = useState<string | null>(null)
+  const [selected, setSelected] = useState<string | null>(params.get('order'))
   const [page, setPage] = useState(0)
   const filtered = useMemo(
     () =>

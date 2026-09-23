@@ -113,6 +113,11 @@ def calculate(item, as_of: date, scenario: Scenario, commitments: list[dict] | N
     profile = seasonal_profile(data, scenario.use_seasonality)
     history, exclusions, corrections, history_warnings = cleaned_history(data, as_of, scenario, profile)
     warnings.extend(history_warnings)
+    # Blank cells may fill gaps, but an entirely unobserved series is not evidence of zero demand.
+    if not any(
+        p < as_of.replace(day=1).isoformat() and q is not None for p, q in data.get("sales", {}).items()
+    ):
+        history = {}
     periods = sorted(history)[-12:]
     rates = [
         history[p]

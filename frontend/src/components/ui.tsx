@@ -46,6 +46,7 @@ export function Badge({ status }: { status: Risk | string }) {
     approved: 'Approved',
     cancelled: 'Cancelled',
     ready: 'Ready',
+    succeeded: 'Completed',
     failed: 'Failed',
     queued: 'Queued',
     running: 'Processing',
