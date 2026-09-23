@@ -2,6 +2,7 @@ import { useSyncExternalStore } from 'react'
 import { messages } from './messages'
 import { extraMessages } from './extra'
 import { errorMessages } from './errors'
+import { assistantMessages } from './assistant'
 
 export type Language = 'en' | 'ru' | 'kk'
 export const languages: { code: Language; name: string }[] = [
@@ -14,7 +15,7 @@ const locales: Record<Language, string> = { en: 'en-US', ru: 'ru-RU', kk: 'kk-KZ
 const columns: Record<Language, number> = { en: 0, ru: 1, kk: 2 }
 const listeners = new Set<() => void>()
 const aliases = new Map<string, readonly [string, string, string]>()
-const catalog = { ...messages, ...extraMessages, ...errorMessages }
+const catalog = { ...messages, ...extraMessages, ...errorMessages, ...assistantMessages }
 for (const row of Object.values(catalog))
   for (const value of row) if (!aliases.has(value)) aliases.set(value, row)
 

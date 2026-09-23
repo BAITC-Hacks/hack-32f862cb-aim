@@ -187,3 +187,54 @@ export interface AgentRun {
     limitations: string[]
   }>
 }
+
+export interface AssistantStatus {
+  configured: boolean
+  model: string
+  requests_per_hour: number
+  operations: string[]
+  function_calling: boolean
+  tools: { name: string; description: string }[]
+  limits: { max_steps: number; max_tool_calls: number; total_seconds: number; token_budget: number }
+}
+export interface AssistantToolCall {
+  name: string
+  arguments: string
+  ok: boolean
+  error: string | null
+}
+export interface AssistantFacts {
+  as_of: string
+  task: string
+  items_total: number
+  items_shown: number
+  algorithm_version: string
+  risk_before: Record<string, number>
+  risk_after: Record<string, number>
+  order_quantities_by_supplier_and_unit: {
+    supplier: string
+    unit: string
+    before: number
+    after: number
+  }[]
+  items: { before: Record<string, unknown>; after: Record<string, unknown> | null }[]
+  limitations: string[]
+}
+export interface AssistantRun {
+  id: string
+  plan_id: string
+  created_at: string
+  status: 'queued' | 'running' | 'ready' | 'failed'
+  model: string
+  request: { task: string; question: string; item_id: string | null }
+  result: Partial<{
+    answer: string
+    response_id: string
+    model: string
+    usage: { input_tokens: number; output_tokens: number; total_tokens: number }
+    tool_calls: AssistantToolCall[]
+    steps: number
+    facts: AssistantFacts
+  }>
+  job: Job
+}

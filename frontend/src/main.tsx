@@ -9,6 +9,7 @@ import '@fontsource/inter/700.css'
 import './styles.css'
 import './styles-responsive.css'
 import './styles-i18n.css'
+import './styles-assistant.css'
 import App from './App'
 
 class ErrorBoundary extends Component<{ children: ReactNode }, { failed: boolean }> {

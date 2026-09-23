@@ -565,12 +565,22 @@ def export_order(identifier: uuid.UUID, db: DB, actor: Reader):
 
 @app.get("/api/v1/assistant/status", tags=["AI Assistant"])
 def assistant_status(actor: Reader):
+    from optistock.tools import DEFINITIONS
+
+    config = settings()
     return {
-        "configured": bool(settings().openai_api_key.get_secret_value().strip()),
-        "model": settings().openai_model,
-        "requests_per_hour": settings().ai_requests_per_hour,
+        "configured": bool(config.openai_api_key.get_secret_value().strip()),
+        "model": config.openai_model,
+        "requests_per_hour": config.ai_requests_per_hour,
         "operations": ["risks", "explain", "what_if"],
-        "function_calling": False,
+        "function_calling": True,
+        "tools": [{"name": t["name"], "description": t["description"]} for t in DEFINITIONS],
+        "limits": {
+            "max_steps": config.ai_max_steps,
+            "max_tool_calls": config.ai_max_tool_calls,
+            "total_seconds": config.ai_total_seconds,
+            "token_budget": config.ai_token_budget,
+        },
     }
 
 

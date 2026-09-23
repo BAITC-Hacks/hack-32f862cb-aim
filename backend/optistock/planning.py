@@ -57,12 +57,26 @@ def cleaned_history(data, as_of, scenario, profile):
         if event["q"] > 0:
             documents[(event["date"], event["document"])] += event["q"]
     exclusions = []
-    if scenario.remove_outliers and len(documents) >= 8:
+    threshold, method = None, None
+    if scenario.remove_outliers and documents:
         values = list(documents.values())
-        logs = [math.log1p(v) for v in values]
-        center = median(logs)
-        mad = median(abs(v - center) for v in logs)
-        threshold = max(5 * median(values), math.expm1(center + 4.5 * 1.4826 * mad))
+        if len(documents) >= 8:
+            logs = [math.log1p(v) for v in values]
+            center = median(logs)
+            mad = median(abs(v - center) for v in logs)
+            threshold = max(5 * median(values), math.expm1(center + 4.5 * 1.4826 * mad))
+            method = "document_log_mad"
+        else:
+            # Too few documents for a stable document-level distribution. Fall back to the monthly
+            # series, which carries more observations here, and keep the bar deliberately high so
+            # regular wholesale demand is never mistaken for a one-off spike.
+            monthly = sorted(q for q in history.values() if q > 0)
+            if len(monthly) >= 4:
+                threshold = max(5 * median(monthly), 2 * max(monthly[:-1]))
+                method = "monthly_median_fallback"
+            else:
+                warnings.append("insufficient_history_for_outlier_detection")
+    if threshold is not None:
         large = [(k, v) for k, v in documents.items() if v > threshold]
         repeated_months = {key[0][:7] for key, _ in large}
         # Conservatively preserve repeated wholesale-sized demand, even without customer IDs.
@@ -82,7 +96,7 @@ def cleaned_history(data, as_of, scenario, profile):
                             "document": doc,
                             "original": rounded(quantity),
                             "removed": rounded(removed),
-                            "method": "document_log_mad",
+                            "method": method,
                         }
                     )
     corrections = []

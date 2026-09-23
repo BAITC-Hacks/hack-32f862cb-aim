@@ -19,6 +19,7 @@ import { Link } from 'react-router-dom'
 import { useWorkspace } from '../store'
 import { useShell } from '../components/Layout'
 import { Badge, Button, InlineError, Panel, Toggle } from '../components/ui'
+import { AssistantPanel } from '../components/AssistantPanel'
 import { defaultScenario } from '../lib/demo'
 import { downloadBlob, errorMessage, formatDate, formatNumber, supplierName } from '../lib/format'
 import { agentStepDetail } from '../i18n/domain'
@@ -598,6 +599,7 @@ export function Agent() {
               </dl>
             </Panel>
           )}
+          {run?.plan_id && <AssistantPanel planId={run.plan_id} />}
           <Panel title={t('История запусков')}>
             <div className="agent-history">
               {runs.length ? (

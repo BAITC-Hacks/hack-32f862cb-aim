@@ -21,6 +21,11 @@ class Settings(BaseSettings):
     openai_model: str = "gpt-5.4-mini-2026-03-17"
     ai_timeout_seconds: int = Field(default=45, ge=5, le=120)
     ai_requests_per_hour: int = Field(default=30, ge=1, le=300)
+    # Budgets for the function-calling loop: model turns, tool executions, wall clock and tokens.
+    ai_max_steps: int = Field(default=6, ge=1, le=12)
+    ai_max_tool_calls: int = Field(default=12, ge=1, le=40)
+    ai_total_seconds: int = Field(default=180, ge=10, le=600)
+    ai_token_budget: int = Field(default=120_000, ge=2000, le=1_000_000)
 
 
 @lru_cache

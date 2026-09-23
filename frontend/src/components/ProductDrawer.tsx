@@ -9,6 +9,7 @@ import type { Explanation, Product } from '../types'
 import { Badge, Button, Dialog, InlineError, Loading } from './ui'
 import { DemandChart } from './charts'
 import { DemandHistory } from './DemandHistory'
+import { AssistantPanel } from './AssistantPanel'
 
 export function ProductDrawer({ product, onClose }: { product: Product; onClose: () => void }) {
   useLanguage()
@@ -159,6 +160,14 @@ export function ProductDrawer({ product, onClose }: { product: Product; onClose:
             {t('No recommendation yet. Run an analysis for this dataset to calculate procurement needs.')}
           </span>
         </div>
+      )}
+      {ws.planId && explanation && (
+        <AssistantPanel
+          planId={ws.planId}
+          itemId={product.id}
+          itemCode={product.code}
+          defaultTask="explain"
+        />
       )}
       <div className="drawer-footer">
         <div className="small-note">

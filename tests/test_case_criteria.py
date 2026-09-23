@@ -85,3 +85,38 @@ def test_repeated_wholesale_demand_is_preserved():
             {"date": f"2026-{month:02d}-21", "q": 5000, "document": f"regular-{month}"}
         )
     assert not calculate(item, AS_OF, BASE)[3]["outlier_exclusions"]
+
+
+def short_history_with_one_document(spike_months=(8,)):
+    """Six observed months of steady demand, plus a single large project document."""
+    sales = {f"2026-{m:02d}-01": 10 for m in range(3, 9)}
+    events = []
+    for month in spike_months:
+        sales[f"2026-{month:02d}-01"] += 5000
+        events.append({"date": f"2026-{month:02d}-21", "q": 5000, "document": f"project-{month}"})
+    return product(sales=sales, events=events)
+
+
+def test_one_off_document_on_a_short_history_does_not_inflate_the_regular_order():
+    baseline = calculate(product(sales={f"2026-{m:02d}-01": 10 for m in range(3, 9)}), AS_OF, BASE)[0]
+    item = short_history_with_one_document()
+    clean, _, _, explanation = calculate(item, AS_OF, BASE)
+    raw = calculate(item, AS_OF, BASE.model_copy(update={"remove_outliers": False}))[0]
+    # Fewer than eight documents used to disable outlier handling entirely.
+    assert explanation["outlier_exclusions"][0]["method"] == "monthly_median_fallback"
+    assert raw > baseline * 10
+    assert clean <= baseline * 2
+
+
+def test_short_history_fallback_preserves_repeated_wholesale_demand():
+    item = short_history_with_one_document(spike_months=(6, 7, 8))
+    assert not calculate(item, AS_OF, BASE)[3]["outlier_exclusions"]
+
+
+def test_too_short_history_reports_insufficient_data_instead_of_guessing():
+    sales = {"2026-07-01": 10, "2026-08-01": 5010}
+    item = product(sales=sales, events=[{"date": "2026-08-21", "q": 5000, "document": "project"}])
+    explanation = calculate(item, AS_OF, BASE)[3]
+    assert not explanation["outlier_exclusions"]
+    assert "insufficient_history_for_outlier_detection" in explanation["warnings"]
+    assert "short_history" in explanation["warnings"]
